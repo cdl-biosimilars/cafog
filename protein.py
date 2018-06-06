@@ -1,6 +1,6 @@
 from collections import Counter
 from itertools import product
-import json
+import re
 
 import numpy as np
 import pandas as pd
@@ -135,67 +135,35 @@ class Glycoprotein(Protein):
     """
     A protein with glycans.
 
-    :cvar DEFAULT_NAME
-    :cvar DEFAULT_SEQUENCE
-    :cvar DEFAULT_CHAINS
-    :cvar DEFAULT_DISULFIDES
-    :cvar DEFAULT_SITE_NAME
-
     :ivar dict glycosylation_sites: glycosylation sites
 
     .. automethod:: __init__
     .. automethod:: __str__
     """
 
-    DEFAULT_NAME = "unnamed glycoprotein"
-    DEFAULT_SEQUENCE = ""
-    DEFAULT_CHAINS = 1
-    DEFAULT_DISULFIDES = 0
-    DEFAULT_SITE_NAME = "site"
-
     def __init__(self, filename):
         """
         Create a new glycoprotein.
 
-        :param str filename: JSON file describing the glycoprotein
+        :param str filename: CSV file containing a glycan library
         :return: nothing
         """
 
-        with open(filename) as f:
-            params = json.load(f)
-
-        super().__init__(
-            params.get("name", Glycoprotein.DEFAULT_NAME),
-            params.get("sequence", Glycoprotein.DEFAULT_SEQUENCE),
-            params.get("chains", Glycoprotein.DEFAULT_CHAINS),
-            params.get("disulfides", Glycoprotein.DEFAULT_DISULFIDES))
+        super().__init__()
         self.glycosylation_sites = {}
+        re_chains = re.compile("([^,\s]+)+")
 
-        # parse glycosylation sites in JSON file
-        for site_i, site in enumerate(params.get("glycosylation_sites", [])):
-            site_name = site.get(
-                "name", "{}{:02}".format(Glycoprotein.DEFAULT_SITE_NAME,
-                                         site_i))
-            site_duplicated = site.get("duplicates")
-
-            # (a) the current site duplicates a known site
-            if site_duplicated is not None:
+        library = pd.read_csv(filename).fillna("")
+        for _, row in library.iterrows():
+            chains = re_chains.findall(row.chain)
+            if row.composition == "":
+                row.composition = None
+            glycan = Glycan(name=row.glycan, composition=row.composition)
+            for chain in chains:
                 try:
-                    self.glycosylation_sites[site_name] = \
-                        self.glycosylation_sites[site_duplicated]
+                    self.glycosylation_sites[chain].append(glycan)
                 except KeyError:
-                    raise KeyError("Site '{}' could not be duplicated"
-                                   .format(site_duplicated))
-
-            # (b) parse an N-glycosylation site
-            else:
-                glycans = []
-                for g in site.get("glycans", []):
-                    glycans.append(Glycan(name=g.get("name"),
-                                          composition=g.get("composition"),
-                                          formula=g.get("formula"),
-                                          site=site_name))
-                self.glycosylation_sites[site_name] = glycans
+                    self.glycosylation_sites[chain] = [glycan]
 
     def __str__(self):
         """
