@@ -31,8 +31,7 @@ class Glycoprotein:
         for _, row in glycan_library.iterrows():
             if row.composition == "":
                 row.composition = None
-            glycan = Glycan(name=row.glycan, composition=row.composition)
-            self.glycan_library.append(glycan)
+            self.add_glycan(name=row.glycan, composition=row.composition)
 
     def __str__(self):
         """
@@ -46,6 +45,17 @@ class Glycoprotein:
         for glycan in self.glycan_library:
             result.append("\t{}".format(glycan))
         return "\n".join(result)
+
+    def add_glycan(self, name, composition=None):
+        """
+        Add a glycan to the library.
+
+        :param str name: name of the glycan
+        :param str composition: monosaccharide composition
+        :return: nothing
+        """
+
+        self.glycan_library.append(Glycan(name=name, composition=composition))
 
     def unique_glycoforms(self):
         """
