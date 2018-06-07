@@ -3,7 +3,7 @@ from itertools import product
 import numpy as np
 import pandas as pd
 
-from formula import Glycan, PTMComposition
+from glycan import Glycan, PTMComposition
 
 
 class Glycoprotein:
@@ -16,7 +16,7 @@ class Glycoprotein:
     .. automethod:: __str__
     """
 
-    def __init__(self, sites, library):
+    def __init__(self, sites, library=None):
         """
         Create a new glycoprotein.
 
@@ -27,11 +27,12 @@ class Glycoprotein:
         self.sites = sites
         self.glycan_library = []
 
-        glycan_library = pd.read_csv(library).fillna("")
-        for _, row in glycan_library.iterrows():
-            if row.composition == "":
-                row.composition = None
-            self.add_glycan(name=row.glycan, composition=row.composition)
+        if library is not None:
+            glycan_library = pd.read_csv(library).fillna("")
+            for _, row in glycan_library.iterrows():
+                if row.composition == "":
+                    row.composition = None
+                self.add_glycan(name=row.glycan, composition=row.composition)
 
     def __str__(self):
         """
@@ -73,13 +74,12 @@ class Glycoprotein:
                                for ptm in combination],
                               PTMComposition())
             name = "/".join([ptm.name for ptm in combination])
-            mass = sum([ptm.mass() for ptm in combination])
             abundance = np.prod([ptm.abundance for ptm in combination])
-            glycoforms.append((composition, name, mass, abundance))
+            glycoforms.append((composition, name, abundance))
 
         # eliminate glycoforms with equal monosaccharide composition
         glycoforms = pd.DataFrame(
-            glycoforms, columns=["composition", "name", "mass", "abundance"])
+            glycoforms, columns=["composition", "name", "abundance"])
         glycoforms["group_key"] = glycoforms.apply(
             lambda p: hash(p.composition), axis=1)
         glycoforms_agg = (
@@ -87,7 +87,6 @@ class Glycoprotein:
             .groupby("group_key")
             .agg({"composition": lambda x: x.iloc[0],
                   "name": lambda n: " or ".join(n),
-                  "mass": lambda x: x.iloc[0],
                   "abundance": sum})
             .reset_index(drop=True)
         )
@@ -100,11 +99,5 @@ class Glycoprotein:
         # and relative abundance and create the generator
         for _, row in glycoforms_agg.iterrows():
             row.composition.name = row["name"]
-            row.composition.mass = row.mass
             row.composition.abundance = row.abundance
             yield row.composition
-
-# gp = Glycoprotein(2, "data/glycans.csv")
-# # print(gp)
-# for c in gp.unique_glycoforms():
-#     print(c) TODO remove
