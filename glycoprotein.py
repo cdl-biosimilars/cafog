@@ -11,6 +11,7 @@ class Glycoprotein:
     A protein with glycans.
 
     :ivar dict glycosylation_sites: glycosylation sites
+    :ivar int sites: number of glycosylation sites
 
     .. automethod:: __init__
     .. automethod:: __str__
@@ -20,7 +21,8 @@ class Glycoprotein:
         """
         Create a new glycoprotein.
 
-        :param str library: CSV file containing a glycan library
+        :param str library: CSV file containing a glycan library; file must
+                            contain two columns (name and composition)
         :return: nothing
         """
 
@@ -60,10 +62,11 @@ class Glycoprotein:
 
     def unique_glycoforms(self):
         """
-        Calculate all glycoforms unique in terms
-        of monosaccharide composition.
+        Calculate all glycoforms unique
+        in terms of monosaccharide composition.
 
-        :return: a generator that yields all unique monosaccharide compositions
+        :return: a generator that yields all unique
+                 monosaccharide compositions
         :rtype: generator(PTMComposition)
         """
 

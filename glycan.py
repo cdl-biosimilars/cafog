@@ -20,9 +20,9 @@ class Glycan:
         """
         Create a new glycan.
 
-        :param str name: name of the glycan; converted to a composition
-                         if composition is None and name is a valid Zhang name
-        :param str composition: comma-separated list of monosaccharides
+        :param str name: name of the glycan
+        :param str composition: comma-separated list of monosaccharides;
+                                if None, calculated from the name
         :param float abundance: relative abundance
         """
 
@@ -40,7 +40,9 @@ class Glycan:
         Convert a glycan abbreviation in Zhang nomenclature (e.g., "A2G1F")
         to a composition string (e.g., "4 Hex, 3 HexNAc, 1 Fuc").
 
-        :param str glycan: a glycan abbreviation
+        :param str glycan: a glycan abbreviation in Zhang nomenclature;
+                           empty glycans are indicated by one of the strings
+                           "", "null", "non-glycosylated", or "unglycosylated"
         :return: a composition string
         :rtype: str
         :raises ValueError: if the conversion fails
@@ -315,6 +317,3 @@ class PTMComposition:
             mods=-self.composition,
             name="-" + self.name,
             abundance=-self.abundance)
-
-if __name__ == "__main__":
-    print(Glycan("A2S2G0F"))

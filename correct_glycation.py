@@ -165,7 +165,8 @@ if __name__ == "__main__":
                         level=logging.INFO)
 
     # set up options for the argument parser
-    parser = argparse.ArgumentParser(description="")
+    parser = argparse.ArgumentParser(
+        description="Correct glycation influence on glycoform abundances.")
     parser.add_argument("-v", "--version",
                         action="version",
                         help="print the version number",
