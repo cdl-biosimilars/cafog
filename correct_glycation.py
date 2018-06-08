@@ -151,13 +151,16 @@ def save_glycoform_list(G, outfile):
     """
 
     glycoforms = []
+    composition = []
     for n in G:
         glycoforms.append((n.name,
-                           n.composition_str(),
                            G.nodes[n]["abundance"],
                            G.nodes[n]["corr_abundance"]))
-    (pd.DataFrame(glycoforms, columns=["glycoform", "composition",
-                                       "abundance", "corr_abundance"])
+        composition.append(n.composition)
+    composition = pd.concat(composition, axis=1)  # type: pd.DataFrame
+    (pd.DataFrame(glycoforms, columns=["glycoform", "abundance",
+                                       "corr_abundance"])
+       .join(composition.T)
        .sort_values("corr_abundance", ascending=False)
        .to_csv(outfile, index=False))
 
