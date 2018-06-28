@@ -15,7 +15,9 @@ from glycan import PTMComposition
 from glycoprotein import Glycoprotein
 
 
-def calc_glycation_graph(glycan_library, glycoforms, glycation):
+def calc_glycation_graph(glycan_library: str,
+                         glycoforms: pd.Series,
+                         glycation: pd.Series) -> nx.DiGraph:
     """
     Assemble the glycoform graph from peptide mapping
     and glycation frequency data.
@@ -112,12 +114,13 @@ def calc_glycation_graph(glycan_library, glycoforms, glycation):
     return G
 
 
-def correct_abundances(G):
+def correct_abundances(G: nx.DiGraph) -> None:
     """
     Correct abundances in the glycoform graph.
 
     :param nx.DiGraph G: a glycoform graph
     :return: nothing, G is modified in place
+    :rtype: None
     """
 
     # calculate corrected abundance for each node from source to sink
@@ -132,14 +135,16 @@ def correct_abundances(G):
         G.nodes[n]["corr_abundance"] = corr_abundance
 
 
-def save_glycoform_list(G, outfile):
+def save_glycoform_list(G: nx.DiGraph,
+                        filename: str) -> None:
     """
     Convert the glycoform graph to a list of glycoforms
     with corrected abundances.
 
     :param nx.DiGraph G: glycoform graph
-    :param str outfile: output file name
+    :param str filename: name of the output file
     :return: nothing
+    :rtype: None
     """
 
     glycoforms = []
@@ -157,10 +162,39 @@ def save_glycoform_list(G, outfile):
                                        "corr_abundance_error"])
        .join(composition.T)
        .sort_values("corr_abundance", ascending=False)
-       .to_csv(outfile, index=False))
+       .to_csv("{}_corr.csv".format(filename), index=False))
 
 
-def read_clean_datasets(filename):
+def save_graph(G: nx.DiGraph,
+               filename: str,
+               output_format: str) -> None:
+    """
+    Export the glycation graph in a graph file format.
+
+    :param nx.DiGraph G: glycation graph to be exported
+    :param str filename: name of the output file
+    :param str output_format: either ``"dot"`` or ``"gexf"``
+    :return: nothing
+    :rtype: None
+    """
+
+    if output_format == "dot":
+        # create more informative labels for the dot format
+        for n in G:
+            G.nodes[n]["label"] = "{}|{:.2f}|{:.2f}".format(
+                n.name, n.abundance, G.nodes[n]["corr_abundance"])
+            G.nodes[n]["shape"] = "record"
+        for source, sink in G.edges:
+            new_label = "{}: {:.2%}".format(
+                G[source][sink]["label"], G[source][sink]["c"])
+            G[source][sink]["label"] = new_label
+        nx.nx_pydot.write_dot(G, "{}_corr.gv".format(filename))
+
+    elif output_format == "gexf":
+        nx.write_gexf(G, "{}_corr.gexf".format(filename))
+
+
+def read_clean_datasets(filename: str) -> pd.Series:
     """
     Read input datasets (glycoforms, glycations) and prepare for analysis,
     i.e., generate a single column containing abundances with uncertainties.
@@ -232,31 +266,11 @@ if __name__ == "__main__":
         logging.error(e)
         sys.exit(-1)
 
-    # assemble the glycation graph and correct abundances
+    # assemble the glycation graph, correct abundances and store
     logging.info("Correcting dataset '{}' …".format(args.glycoforms))
-    G = calc_glycation_graph(
-        glycan_library=args.glycan_library,
-        glycoforms=glycoforms,
-        glycation=glycation)
+    G = calc_glycation_graph(args.glycan_library, glycoforms, glycation)
     correct_abundances(G)
-    save_glycoform_list(
-        G,
-        outfile="{}_corr.csv".format(dataset_name))
-
-    # output graph data
-    if args.output_format == "dot":
-        # create more informative labels for the dot format
-        for n in G:
-            G.nodes[n]["label"] = "{}|{:.2f}|{:.2f}".format(
-                n.name, n.abundance, G.nodes[n]["corr_abundance"])
-            G.nodes[n]["shape"] = "record"
-        for source, sink in G.edges:
-            new_label = "{}: {:.2%}".format(
-                G[source][sink]["label"], G[source][sink]["c"])
-            G[source][sink]["label"] = new_label
-        nx.nx_pydot.write_dot(G, "{}_corr.gv".format(dataset_name))
-
-    elif args.output_format == "gexf":
-        nx.write_gexf(G, "{}_corr.gexf".format(dataset_name))
+    save_glycoform_list(G, dataset_name)
+    save_graph(G, dataset_name, args.output_format)
 
     logging.info("… done!")
