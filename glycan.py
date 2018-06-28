@@ -1,4 +1,5 @@
 import re
+from typing import Any, Dict, Optional, Union
 
 import pandas as pd
 import pandas.core.series
@@ -16,7 +17,10 @@ class Glycan:
     .. automethod:: __str__
     """
 
-    def __init__(self, name=None, composition=None, abundance=0.0):
+    def __init__(self,
+                 name: Optional[str]=None,
+                 composition: Optional[str]=None,
+                 abundance: float=0.0) -> None:
         """
         Create a new glycan.
 
@@ -24,6 +28,8 @@ class Glycan:
         :param str composition: comma-separated list of monosaccharides;
                                 if None, calculated from the name
         :param float abundance: relative abundance
+        :return: nothing
+        :rtype: None
         """
 
         self.name = name
@@ -35,7 +41,7 @@ class Glycan:
         self.abundance = abundance
 
     @staticmethod
-    def extract_composition(glycan):
+    def extract_composition(glycan: str) -> str:
         """
         Convert a glycan abbreviation in Zhang nomenclature (e.g., "A2G1F")
         to a composition string (e.g., "4 Hex, 3 HexNAc, 1 Fuc").
@@ -48,7 +54,7 @@ class Glycan:
         :raises ValueError: if the conversion fails
         """
 
-        re_zhang_glycan = re.compile(r"""
+        re_zhang = re.compile(r"""
             ^
             (?:A(?P<A>\d)+)?    # antennas
             (?:Sg(?P<Sg>\d)+)?  # Neu5Gc
@@ -62,7 +68,7 @@ class Glycan:
             """, re.VERBOSE)
 
         try:
-            g = re_zhang_glycan.match(glycan).groupdict()
+            g = re_zhang.match(glycan).groupdict()  # type: Dict[str, Any]
         except (AttributeError, TypeError):
             if glycan in ["non-glycosylated", "unglycosylated", "null"]:
                 g = {}
@@ -94,7 +100,7 @@ class Glycan:
                          for m, c in zip(monosaccharides, counts)
                          if c > 0)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Convert the glycan to a human-readable string.
 
@@ -124,7 +130,10 @@ class PTMComposition:
     .. automethod:: __neg__
     """
 
-    def __init__(self, mods=None, name=None, abundance=None):
+    def __init__(self,
+                 mods: Union[pd.Series, dict, str, None]=None,
+                 name: Optional[str]=None,
+                 abundance: Optional[float]=None) -> None:
         """
         Creates a new PTM composition.
 
@@ -161,7 +170,7 @@ class PTMComposition:
         self.composition = self.composition[self.composition != 0]
 
     @staticmethod
-    def extract_composition(mods):
+    def extract_composition(mods: str) -> pd.Series:
         """
         Extract the PTM composition from a string like "1 Hex, 2 HexNAc, Fuc".
 
@@ -187,7 +196,7 @@ class PTMComposition:
 
         return pd.Series(composition)
 
-    def composition_str(self):
+    def composition_str(self) -> str:
         """
         Returns a string representing the composition of self
         (e.g., "1 Hex, 2 HexNAc"), or "[no PTMs]" for an empty composition.
@@ -202,7 +211,8 @@ class PTMComposition:
             return ", ".join(["{:d} {:s}".format(c, m)
                               for m, c in self.composition.items()])
 
-    def __add__(self, other):
+    def __add__(self,
+                other: "PTMComposition") -> "PTMComposition":
         """
         Add two PTM compositions:
 
@@ -223,7 +233,8 @@ class PTMComposition:
             name=self.name + "+" + other.name,
             abundance=self.abundance + other.abundance)
 
-    def __sub__(self, other):
+    def __sub__(self,
+                other: "PTMComposition") -> "PTMComposition":
         """
         Subtract two PTM compositions:
 
@@ -244,7 +255,7 @@ class PTMComposition:
             name=self.name + "-" + other.name,
             abundance=self.abundance - other.abundance)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Convert the PTM to a human-readable string.
 
@@ -258,7 +269,7 @@ class PTMComposition:
             self.name,
             self.abundance)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         Representation of the PTM object.
 
@@ -268,7 +279,7 @@ class PTMComposition:
 
         return self.__str__()
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Calculates the hash value, which is the hash of the tuple of tuples
         describing self's composition.
@@ -279,7 +290,8 @@ class PTMComposition:
 
         return hash(tuple(self.composition.iteritems()))
 
-    def __eq__(self, other):
+    def __eq__(self,
+               other: "PTMComposition") -> bool:
         """
         Determine equality.
 
@@ -290,7 +302,8 @@ class PTMComposition:
 
         return dict(self.composition) == dict(other.composition)
 
-    def __ne__(self, other):
+    def __ne__(self,
+               other: "PTMComposition") -> bool:
         """
         Determine inequality.
 
@@ -301,7 +314,7 @@ class PTMComposition:
 
         return not self.__eq__(other)
 
-    def __neg__(self):
+    def __neg__(self) -> "PTMComposition":
         """
         Unary negation:
 
