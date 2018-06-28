@@ -2,13 +2,14 @@
 
 import argparse
 import logging
+import os
 import re
 import sys
 
 from multiset import FrozenMultiset
 import networkx as nx
-import numpy as np
 import pandas as pd
+from uncertainties import ufloat
 
 from glycan import PTMComposition
 from glycoprotein import Glycoprotein
@@ -20,8 +21,8 @@ def calc_glycation_graph(glycan_library, glycoforms, glycation):
     and glycation frequency data.
 
     :param str glycan_library: CSV file containing a glycan library
-    :param pd.Series glycoforms: list of glycoforms with abundances
-    :param pd.Series glycation: list of glycation counts with abundance
+    :param pd.Series glycoforms: list of glycoforms with abundances/errors
+    :param pd.Series glycation: list of glycations with abundances/errors
     :return: the glycation DAG
     :rtype: nx.DiGraph
     """
@@ -31,14 +32,14 @@ def calc_glycation_graph(glycan_library, glycoforms, glycation):
     re_first_glycoform = re.compile("([^\s]*)")
 
     # series with a monosaccharide set as index
-    # and experimental abundances as values
-    exp_abundances = glycoforms.rename("abundance").reset_index()
-    exp_abundances["sugar_set"] = exp_abundances.glycoform.apply(
+    # and abundances as values
+    exp_abundances = glycoforms.reset_index()
+    exp_abundances["sugar_set"] = exp_abundances["index_col"].apply(
         lambda v: FrozenMultiset(v.split("/")))
-    exp_abundances = exp_abundances.set_index("sugar_set").abundance
+    exp_abundances = exp_abundances.set_index("sugar_set")["abundance"]
 
-    # dict mapping PTM differences to abundances
-    delta_ptm = {PTMComposition({"Hex": count}): abundance
+    # dict mapping hexose differences to abundances
+    delta_ptm = {PTMComposition({"Hex": count}): abundance / 100
                  for count, abundance in glycation.iteritems()
                  if count > 0}
 
@@ -76,8 +77,8 @@ def calc_glycation_graph(glycan_library, glycoforms, glycation):
     G = nx.DiGraph()
     for glycoform in gp.unique_glycoforms():
         # get the experimental abundance of a glycoform
-        # use a default value of 0 if unavailable
-        abundance = 0.0
+        # use a default value of 0±0 if unavailable
+        abundance = ufloat(0, 0)
         for name in glycoform.name.split(" or "):
             try:
                 abundance = exp_abundances[FrozenMultiset(name.split("/"))]
@@ -91,7 +92,7 @@ def calc_glycation_graph(glycan_library, glycoforms, glycation):
         # the dict of PTM differences
         G.add_node(
             glycoform,
-            abundance=float(abundance),
+            abundance=abundance,
             label=re_first_glycoform.match(glycoform.name).group())
         for n in G:
             d = glycoform - n
@@ -107,7 +108,7 @@ def calc_glycation_graph(glycan_library, glycoforms, glycation):
                     sink = n
                 except KeyError:
                     continue
-            G.add_edge(source, sink, label=d.composition_str(), c=float(c))
+            G.add_edge(source, sink, label=d.composition_str(), c=c)
     return G
 
 
@@ -119,10 +120,7 @@ def correct_abundances(G):
     :return: nothing, G is modified in place
     """
 
-    total_abundance = 0.0
-
-    # first pass: abundance correction,
-    # calculated for each node from source to sink
+    # calculate corrected abundance for each node from source to sink
     for n in nx.topological_sort(G):
         in_abundance = 0.0
         for pred in G.predecessors(n):
@@ -131,13 +129,7 @@ def correct_abundances(G):
         for succ in G.successors(n):
             out_c += G[n][succ]["c"]
         corr_abundance = (n.abundance - in_abundance) / (1 - out_c)
-        total_abundance += corr_abundance
-        G.nodes[n]["corr_abundance"] = float(corr_abundance)
-
-    # second pass: calculate fractional abundance
-    for n in G:
-        G.nodes[n]["corr_abundance"] = float(G.nodes[n]["corr_abundance"]
-                                             / total_abundance * 100)
+        G.nodes[n]["corr_abundance"] = corr_abundance
 
 
 def save_glycoform_list(G, outfile):
@@ -154,15 +146,50 @@ def save_glycoform_list(G, outfile):
     composition = []
     for n in G:
         glycoforms.append((n.name,
-                           G.nodes[n]["abundance"],
-                           G.nodes[n]["corr_abundance"]))
+                           G.nodes[n]["abundance"].nominal_value,
+                           G.nodes[n]["abundance"].std_dev,
+                           G.nodes[n]["corr_abundance"].nominal_value,
+                           G.nodes[n]["corr_abundance"].std_dev))
         composition.append(n.composition)
     composition = pd.concat(composition, axis=1)  # type: pd.DataFrame
     (pd.DataFrame(glycoforms, columns=["glycoform", "abundance",
-                                       "corr_abundance"])
+                                       "abundance_error", "corr_abundance",
+                                       "corr_abundance_error"])
        .join(composition.T)
        .sort_values("corr_abundance", ascending=False)
        .to_csv(outfile, index=False))
+
+
+def read_clean_datasets(filename):
+    """
+    Read input datasets (glycoforms, glycations) and prepare for analysis,
+    i.e., generate a single column containing abundances with uncertainties.
+
+    :param str filename: name of the file containing the dataset
+    :return: a series called "abundance" containing a value with uncertainty
+             and an index named "index_col"
+    :rtype: pd.Series
+    :raises ValueError: if the input dataset contains too few columns
+    """
+
+    df = pd.read_csv(filename, comment="#", index_col=0, header=None)
+    col_count = df.shape[1]
+
+    if col_count == 0:  # too few columns
+        raise ValueError("{} contains too few columns.".format(filename))
+    elif col_count == 1:  # add error column
+        logging.warning(
+            "{} lacks a column containing errors. Assuming errors of zero."
+            .format(filename))
+        df["auto_error_column"] = 0
+    elif col_count > 2:  # remove surplus columns
+        logging.warning(
+            "{} contains {} additional columns, which will be ignored."
+            .format(filename, col_count-2))
+        df = df.iloc[:, :3]
+    df.index.name = "index_col"
+    df["abundance"] = df.apply(lambda r: ufloat(r.iloc[0], r.iloc[1]), axis=1)
+    return df["abundance"]
 
 
 if __name__ == "__main__":
@@ -196,47 +223,40 @@ if __name__ == "__main__":
                         required=True)
     args = parser.parse_args()
 
-    glycoforms = pd.read_csv(args.glycoforms, index_col="glycoform")
-    glycation = pd.read_csv(args.glycation, index_col="count")
+    # read input files
+    dataset_name = os.path.splitext(args.glycoforms)[0]
+    try:
+        glycoforms = read_clean_datasets(args.glycoforms)
+        glycation = read_clean_datasets(args.glycation)
+    except ValueError as e:
+        logging.error(e)
+        sys.exit(-1)
 
-    # check whether column names for glycoform and glycation data are equal
-    columns_identical = (
-        glycoforms.columns == glycation.columns)  # type: np.ndarray
-    if not all(columns_identical):
-        error_msg = ["The following column names differ:",
-                     "{}\t{}".format(args.glycoforms, args.glycation)]
-        for i in np.where(~columns_identical)[0]:
-            error_msg.append(
-                "{}\t{}".format(glycoforms.columns[i], glycation.columns[i]))
-        logging.error("\n".join(error_msg))
-        sys.exit(1)
+    # assemble the glycation graph and correct abundances
+    logging.info("Correcting dataset '{}' …".format(args.glycoforms))
+    G = calc_glycation_graph(
+        glycan_library=args.glycan_library,
+        glycoforms=glycoforms,
+        glycation=glycation)
+    correct_abundances(G)
+    save_glycoform_list(
+        G,
+        outfile="{}_corr.csv".format(dataset_name))
 
-    for col in glycoforms.columns:
-        # assemble the glycation graph and correct abundances
-        logging.info("Correcting dataset '{}' …".format(col))
-        G = calc_glycation_graph(
-            glycan_library=args.glycan_library,
-            glycoforms=glycoforms[col],
-            glycation=glycation[col])
-        correct_abundances(G)
-        save_glycoform_list(
-            G,
-            outfile="{}_corr.csv".format(col))
+    # output graph data
+    if args.output_format == "dot":
+        # create more informative labels for the dot format
+        for n in G:
+            G.nodes[n]["label"] = "{}|{:.2f}|{:.2f}".format(
+                n.name, n.abundance, G.nodes[n]["corr_abundance"])
+            G.nodes[n]["shape"] = "record"
+        for source, sink in G.edges:
+            new_label = "{}: {:.2%}".format(
+                G[source][sink]["label"], G[source][sink]["c"])
+            G[source][sink]["label"] = new_label
+        nx.nx_pydot.write_dot(G, "{}_corr.gv".format(dataset_name))
 
-        # output graph data
-        if args.output_format == "dot":
-            # create more informative labels for the dot format
-            for n in G:
-                G.nodes[n]["label"] = "{}|{:.2f}|{:.2f}".format(
-                    n.name, n.abundance, G.nodes[n]["corr_abundance"])
-                G.nodes[n]["shape"] = "record"
-            for source, sink in G.edges:
-                new_label = "{}: {:.2%}".format(
-                    G[source][sink]["label"], G[source][sink]["c"])
-                G[source][sink]["label"] = new_label
-            nx.nx_pydot.write_dot(G, "{}_corr.gv".format(col))
-
-        elif args.output_format == "gexf":
-            nx.write_gexf(G, "{}_corr.gexf".format(col))
+    elif args.output_format == "gexf":
+        nx.write_gexf(G, "{}_corr.gexf".format(dataset_name))
 
     logging.info("… done!")
