@@ -223,6 +223,19 @@ def save_graph(G: nx.DiGraph,
         nx.nx_pydot.write_dot(G, "{}_corr.gv".format(filename))
 
     elif output_format == "gexf":
+        # split each ufloat attribute into two float attributes
+        for n in G:
+            G.nodes[n]["abundance_error"] = float(
+                G.nodes[n]["abundance"].std_dev)
+            G.nodes[n]["abundance"] = float(
+                G.nodes[n]["abundance"].nominal_value)
+            G.nodes[n]["corr_abundance_error"] = float(
+                G.nodes[n]["corr_abundance"].std_dev)
+            G.nodes[n]["corr_abundance"] = float(
+                G.nodes[n]["corr_abundance"].nominal_value)
+        for source, sink in G.edges:
+            G[source][sink]["c_error"] = float(G[source][sink]["c"].std_dev)
+            G[source][sink]["c"] = float(G[source][sink]["c"].nominal_value)
         nx.write_gexf(G, "{}_corr.gexf".format(filename))
 
 
