@@ -1,4 +1,5 @@
 from itertools import product
+from typing import Iterator
 
 import numpy as np
 import pandas as pd
@@ -17,13 +18,17 @@ class Glycoprotein:
     .. automethod:: __str__
     """
 
-    def __init__(self, sites, library=None):
+    def __init__(self,
+                 sites: int,
+                 library: str=None) -> None:
         """
         Create a new glycoprotein.
 
+        :param int sites: number of glycosylation sites
         :param str library: CSV file containing a glycan library; file must
                             contain two columns (name and composition)
         :return: nothing
+        :rtype: None
         """
 
         self.sites = sites
@@ -36,7 +41,7 @@ class Glycoprotein:
                     row.composition = None
                 self.add_glycan(name=row.glycan, composition=row.composition)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Convert the glycoprotein to a human-readable string.
 
@@ -49,25 +54,28 @@ class Glycoprotein:
             result.append("\t{}".format(glycan))
         return "\n".join(result)
 
-    def add_glycan(self, name, composition=None):
+    def add_glycan(self,
+                   name: str,
+                   composition: str=None) -> None:
         """
         Add a glycan to the library.
 
         :param str name: name of the glycan
         :param str composition: monosaccharide composition
         :return: nothing
+        :rtype: None
         """
 
         self.glycan_library.append(Glycan(name=name, composition=composition))
 
-    def unique_glycoforms(self):
+    def unique_glycoforms(self) -> Iterator[PTMComposition]:
         """
         Calculate all glycoforms unique
         in terms of monosaccharide composition.
 
         :return: a generator that yields all unique
                  monosaccharide compositions
-        :rtype: generator(PTMComposition)
+        :rtype: Iterator(PTMComposition)
         """
 
         # determine all glycoforms by calculating the cartesian product
