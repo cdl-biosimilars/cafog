@@ -11,7 +11,7 @@ import networkx as nx
 import pandas as pd
 from uncertainties import ufloat
 
-from correction import read_clean_datasets
+from correction import read_clean_datasets, read_library
 from glycan import PTMComposition
 from glycoprotein import Glycoprotein
 
@@ -257,7 +257,7 @@ if __name__ == "__main__":
         if args.glycan_library is None:
             glycan_library = None
         else:
-            glycan_library = pd.read_csv(args.glycan_library)
+            glycan_library = read_library(args.glycan_library)
     except (OSError, ValueError) as e:
         logging.error(e)
         sys.exit(-1)

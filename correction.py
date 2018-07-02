@@ -34,3 +34,27 @@ def read_clean_datasets(filename: str) -> pd.Series:
     df.index.name = "index_col"
     df["abundance"] = df.apply(lambda r: ufloat(r.iloc[0], r.iloc[1]), axis=1)
     return df["abundance"]
+
+
+def read_library(filename: str=None) -> pd.DataFrame:
+    """
+    Read glycan library and prepare for analysis.
+
+    :param str filename: name of the file containing the glycan library
+    :return: a dataframe twith wo columns
+            containing glycan names and compositions, respectively
+    :rtype: pd.DataFrame
+    :raises ValueError: if the input dataset contains too few columns
+    """
+
+    df = pd.read_csv(filename, comment="#", header=None)
+    col_count = df.shape[1]
+
+    if col_count < 2:  # too few columns
+        raise ValueError("{} contains too few columns.".format(filename))
+    elif col_count > 2:  # remove surplus columns
+        logging.warning(
+            "{} contains {} additional columns, which will be ignored."
+            .format(filename, col_count-2))
+        df = df.iloc[:, :3]
+    return df
