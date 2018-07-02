@@ -16,14 +16,14 @@ from glycan import PTMComposition
 from glycoprotein import Glycoprotein
 
 
-def calc_glycation_graph(glycan_library: str,
+def calc_glycation_graph(glycan_library: pd.DataFrame,
                          glycoforms: pd.Series,
                          glycation: pd.Series) -> nx.DiGraph:
     """
     Assemble the glycoform graph from peptide mapping
     and glycation frequency data.
 
-    :param str glycan_library: CSV file containing a glycan library
+    :param pd.DataFrame glycan_library: dataframe containing a glycan library
     :param pd.Series glycoforms: list of glycoforms with abundances/errors
     :param pd.Series glycation: list of glycations with abundances/errors
     :return: the glycation DAG
@@ -46,36 +46,48 @@ def calc_glycation_graph(glycan_library: str,
                  for count, abundance in glycation.iteritems()
                  if count > 0}
 
-    # compare monosaccharide set of glycan library and glycoforms
-    # add glycans that only appear in the list of glycoforms to the library
-    # but this only works if they have a valid name
     gp = Glycoprotein(sites=2, library=glycan_library)
-    library_glycans = set([n.name for n in gp.glycan_library])
     glycoform_glycans = set()
     for v in exp_abundances.index.values:
         glycoform_glycans |= set(v)
 
-    glycans_only_in_library = library_glycans - glycoform_glycans
-    if glycans_only_in_library:
-        logging.warning(
-            "The following glycans only appear in the glycan library, "
-            + "but not in the list of glycoforms: "
-            + str(glycans_only_in_library)
-            + ".")
-
-    glycans_only_in_glycoforms = glycoform_glycans - library_glycans
-    if glycans_only_in_glycoforms:
-        logging.warning(
-            "The following glycans only appear in the list of glycoforms, "
-            + "but not in the glycan library: "
-            + str(glycans_only_in_glycoforms)
-            + ". They will be added to the library.")
-        for g in glycans_only_in_glycoforms:
+    if glycan_library is None:
+        # fill the glycan library from glycans in glycoforms
+        logging.info("No glycan library specified. "
+                     "Extracting glycans from glycoforms …")
+        for g in glycoform_glycans:
             try:
                 gp.add_glycan(g)
             except ValueError as e:
                 logging.error(e)
                 sys.exit(1)
+    else:
+        # compare monosaccharide set of glycan library and glycoforms
+        # add glycans that only appear in the list of glycoforms to the library
+        # but this only works if they have a valid name
+        library_glycans = set([n.name for n in gp.glycan_library])
+
+        glycans_only_in_library = library_glycans - glycoform_glycans
+        if glycans_only_in_library:
+            logging.warning(
+                "The following glycans only appear in the glycan library, "
+                + "but not in the list of glycoforms: "
+                + str(glycans_only_in_library)
+                + ".")
+
+        glycans_only_in_glycoforms = glycoform_glycans - library_glycans
+        if glycans_only_in_glycoforms:
+            logging.warning(
+                "The following glycans only appear in the list of glycoforms, "
+                + "but not in the glycan library: "
+                + str(glycans_only_in_glycoforms)
+                + ". They will be added to the library.")
+            for g in glycans_only_in_glycoforms:
+                try:
+                    gp.add_glycan(g)
+                except ValueError as e:
+                    logging.error(e)
+                    sys.exit(1)
 
     G = nx.DiGraph()
     for glycoform in gp.unique_glycoforms():
@@ -226,8 +238,7 @@ if __name__ == "__main__":
                         choices=["dot", "gexf"])
     parser.add_argument("-l", "--glycan-library",
                         action="store",
-                        help="CSV file containing a glycan library",
-                        required=True)
+                        help="CSV file containing a glycan library")
     parser.add_argument("-f", "--glycoforms",
                         action="store",
                         help="CSV file containing glycoform abundances",
@@ -243,13 +254,17 @@ if __name__ == "__main__":
     try:
         glycoforms = read_clean_datasets(args.glycoforms)
         glycation = read_clean_datasets(args.glycation)
-    except ValueError as e:
+        if args.glycan_library is None:
+            glycan_library = None
+        else:
+            glycan_library = pd.read_csv(args.glycan_library)
+    except (OSError, ValueError) as e:
         logging.error(e)
         sys.exit(-1)
 
     # assemble the glycation graph, correct abundances and store
     logging.info("Correcting dataset '{}' …".format(args.glycoforms))
-    G = calc_glycation_graph(args.glycan_library, glycoforms, glycation)
+    G = calc_glycation_graph(glycan_library, glycoforms, glycation)
     correct_abundances(G)
     save_glycoform_list(G, dataset_name)
     save_graph(G, dataset_name, args.output_format)

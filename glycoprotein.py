@@ -1,5 +1,5 @@
 from itertools import product
-from typing import Iterator
+from typing import Iterator, Optional
 
 import numpy as np
 import pandas as pd
@@ -20,13 +20,13 @@ class Glycoprotein:
 
     def __init__(self,
                  sites: int,
-                 library: str=None) -> None:
+                 library: Optional[pd.DataFrame]=None) -> None:
         """
         Create a new glycoprotein.
 
         :param int sites: number of glycosylation sites
-        :param str library: CSV file containing a glycan library; file must
-                            contain two columns (name and composition)
+        :param pd.DataFrame library: dataframe describing a glycan library;
+                            mus contain two columns (name and composition)
         :return: nothing
         :rtype: None
         """
@@ -35,11 +35,12 @@ class Glycoprotein:
         self.glycan_library = []
 
         if library is not None:
-            glycan_library = pd.read_csv(library).fillna("")
-            for _, row in glycan_library.iterrows():
-                if row.composition == "":
-                    row.composition = None
-                self.add_glycan(name=row.glycan, composition=row.composition)
+            for _, row in library.iterrows():
+                if np.isnan(row.iloc[1]):
+                    composition = None
+                else:
+                    composition = row.iloc[1]
+                self.add_glycan(name=row.iloc[0], composition=composition)
 
     def __str__(self) -> str:
         """
@@ -56,7 +57,7 @@ class Glycoprotein:
 
     def add_glycan(self,
                    name: str,
-                   composition: str=None) -> None:
+                   composition: Optional[str]=None) -> None:
         """
         Add a glycan to the library.
 
