@@ -4,10 +4,11 @@ import pandas as pd
 
 from PyQt5.QtChart import (QBarCategoryAxis, QBarSeries, QBarSet,
                            QChart, QChartView, QValueAxis)
-from PyQt5.QtCore import Qt, QLocale, QMargins
+from PyQt5.QtCore import Qt, QLibraryInfo, QLocale, QMargins, QTranslator
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import (QApplication, QHeaderView, QMainWindow,
-                             QMessageBox, QTableWidgetItem, QWidget)
+                             QMessageBox, QTableWidgetItem, QWhatsThis,
+                             QWidget)
 
 from correction import read_clean_datasets, read_library
 
@@ -46,6 +47,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # actions
         self.cbAggGlycoforms.clicked.connect(self.toggle_agg_glycoforms)
 
+        self.btHelp.clicked.connect(lambda: QWhatsThis.enterWhatsThisMode())
         self.btLoadGlycation.clicked.connect(self.load_glycation)
         self.btLoadGlycoforms.clicked.connect(self.load_glycoforms)
         self.btLoadLibrary.clicked.connect(self.load_library)
@@ -316,11 +318,26 @@ def _main() -> None:
     :return: nothing
     :rtype: None
     """
+
     app = QApplication(sys.argv)
     QLocale.setDefault(QLocale.c())
+
+    # translation
+    language = QLocale.system().name()[:2]
+    translations_path = QLibraryInfo.location(QLibraryInfo.TranslationsPath)
+
+    base_translator = QTranslator()
+    base_translator.load("qtbase_{}".format(language), translations_path)
+    app.installTranslator(base_translator)
+
+    custom_translator = QTranslator()
+    custom_translator.load("cafog_{}".format(language))
+    app.installTranslator(custom_translator)
+
+    # generate main window
     frame = MainWindow()
     frame.show()
-    app.exec_()
+    sys.exit(app.exec_())
 
 
 if __name__ == "__main__":

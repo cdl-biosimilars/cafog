@@ -155,7 +155,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Correct abundances for glycation"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "CAFoG - Correct abundances for glycation"))
         self.groupBox.setTitle(_translate("MainWindow", "Glycoforms"))
         self.cvGlycoforms.setWhatsThis(_translate("MainWindow", "The whatsthis for the glycoform chart."))
         self.btLoadGlycoforms.setText(_translate("MainWindow", "Load …"))
