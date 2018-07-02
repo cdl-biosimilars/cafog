@@ -47,7 +47,8 @@ def read_library(filename: str=None) -> pd.DataFrame:
     :raises ValueError: if the input dataset contains too few columns
     """
 
-    df = pd.read_csv(filename, comment="#", header=None)
+    df = pd.read_csv(filename, comment="#",
+                     header=None, keep_default_na=False)
     col_count = df.shape[1]
 
     if col_count < 2:  # too few columns
