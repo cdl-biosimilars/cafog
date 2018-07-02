@@ -47,13 +47,29 @@
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Expanding</enum>
+             </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>314</width>
+               <width>1</width>
                <height>17</height>
               </size>
              </property>
             </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="lbGlycoform">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>(glycoform)</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -89,11 +105,18 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>314</width>
+               <width>1</width>
                <height>17</height>
               </size>
              </property>
             </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="lbGlycation">
+             <property name="text">
+              <string>(glycation)</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -136,7 +159,7 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>314</width>
+               <width>1</width>
                <height>17</height>
               </size>
              </property>
@@ -240,10 +263,6 @@
      </widget>
     </item>
    </layout>
-   <zorder>graphicsView</zorder>
-   <zorder>horizontalLayoutWidget_2</zorder>
-   <zorder>groupBox_4</zorder>
-   <zorder>groupBox_4</zorder>
   </widget>
  </widget>
  <customwidgets>
