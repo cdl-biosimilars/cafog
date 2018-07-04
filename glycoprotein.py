@@ -36,7 +36,7 @@ class Glycoprotein:
 
         if library is not None:
             for _, row in library.iterrows():
-                if np.isnan(row.iloc[1]) or row.iloc[1] == "":
+                if pd.isnull(row.iloc[1]):
                     composition = None
                 else:
                     composition = row.iloc[1]
