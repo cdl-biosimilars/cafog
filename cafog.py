@@ -55,7 +55,8 @@ if __name__ == "__main__":
     try:
         G = GlycationGraph(glycan_library, glycoforms, glycation)
         G.correct_abundances()
-        G.to_csv(dataset_name)
+        G.to_dataframe().to_csv("{}_corr.csv".format(dataset_name),
+                                index=False)
         if args.output_format == "dot":
             G.to_dot(dataset_name)
         elif args.output_format == "gexf":

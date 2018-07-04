@@ -149,15 +149,12 @@ class GlycationGraph(nx.DiGraph):
             corr_abundance = (n.abundance - in_abundance) / (1 - out_c)
             self.nodes[n]["corr_abundance"] = corr_abundance
 
-    def to_csv(self,
-               filename: str) -> None:
+    def to_dataframe(self) -> pd.DataFrame:
         """
-        Convert the glycoform graph to a list of glycoforms
-        with corrected abundances.
+        Convert the glycoform graph to a dataframe.
 
-        :param str filename: name of the output file
-        :return: nothing
-        :rtype: None
+        :return: a dataframe containing all glycoforms with abundances
+        :rtype: pd.DataFrame
         """
 
         glycoforms = []
@@ -170,12 +167,12 @@ class GlycationGraph(nx.DiGraph):
                                self.nodes[n]["corr_abundance"].std_dev))
             composition.append(n.composition)
         composition = pd.concat(composition, axis=1)  # type: pd.DataFrame
-        (pd.DataFrame(glycoforms, columns=["glycoform", "abundance",
-                                           "abundance_error", "corr_abundance",
-                                           "corr_abundance_error"])
-           .join(composition.T)
-           .sort_values("corr_abundance", ascending=False)
-           .to_csv("{}_corr.csv".format(filename), index=False))
+        return (pd.DataFrame(glycoforms,
+                             columns=["glycoform", "abundance",
+                                      "abundance_error", "corr_abundance",
+                                      "corr_abundance_error"])
+                  .join(composition.T)
+                  .sort_values("corr_abundance", ascending=False))
 
     def to_dot(self,
                filename: str) -> None:
