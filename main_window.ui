@@ -14,10 +14,7 @@
    <string>CAFoG - Correct abundances for glycation</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_4">
-    <property name="spacing">
-     <number>12</number>
-    </property>
+   <layout class="QVBoxLayout" name="verticalLayout_5">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
@@ -277,6 +274,34 @@
      </widget>
     </item>
     <item>
+     <widget class="QGroupBox" name="groupBox_5">
+      <property name="title">
+       <string>Log</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QTextEdit" name="teLog">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Ignored">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>80</height>
+          </size>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
      <layout class="QHBoxLayout" name="horizontalLayout_6">
       <item>
        <widget class="QPushButton" name="btCorrect">
@@ -304,6 +329,13 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btSampleData">
+        <property name="text">
+         <string>Sample data</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="btHelp">

@@ -1,5 +1,6 @@
 import logging
 import re
+from typing import Optional
 
 from multiset import FrozenMultiset
 import networkx as nx
@@ -18,7 +19,7 @@ class GlycationGraph(nx.DiGraph):
     """
 
     def __init__(self,
-                 glycan_library: pd.DataFrame,
+                 glycan_library: Optional[pd.DataFrame],
                  glycoforms: pd.Series,
                  glycation: pd.Series) -> None:
         """

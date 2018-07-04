@@ -1,4 +1,6 @@
+import logging
 import sys
+from typing import Optional
 
 import pandas as pd
 
@@ -7,13 +9,47 @@ from PyQt5.QtChart import (QBarCategoryAxis, QBarSeries, QBarSet,
 from PyQt5.QtCore import Qt, QLibraryInfo, QLocale, QMargins, QTranslator
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import (QApplication, QHeaderView, QMainWindow,
-                             QMessageBox, QTableWidgetItem, QWhatsThis,
-                             QWidget)
+                             QMessageBox, QTableWidgetItem, QTextEdit,
+                             QWhatsThis, QWidget)
 
-from correction import read_clean_datasets, read_library
+from correction import GlycationGraph, read_clean_datasets, read_library
 
 from main_window import Ui_MainWindow
 from widgets import FileTypes, get_filename
+
+
+class TextEditHandler(logging.Handler):
+    """
+    A handler for Python's logging module
+    which redirects logging output to a QTextEdit.
+
+    .. automethod:: __init__
+    """
+
+    def __init__(self,
+                 widget: QTextEdit) -> None:
+        """
+        Initialize the handler.
+
+        :param QTextEdit widget: textedit that sould display the log
+        :return: nothing
+        :rtype: None
+        """
+
+        super().__init__()
+        self.widget = widget
+
+    def emit(self,
+             record: logging.LogRecord) -> None:
+        """
+        Send the log record to the textedit.
+
+        :param logging.LogRecord record: record to be displayed
+        :return: nothing
+        :rtype: None
+        """
+
+        self.widget.append(self.format(record))
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -47,11 +83,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # actions
         self.cbAggGlycoforms.clicked.connect(self.toggle_agg_glycoforms)
 
+        self.btCorrect.clicked.connect(self.correct_abundances)
         self.btHelp.clicked.connect(lambda: QWhatsThis.enterWhatsThisMode())
-        self.btLoadGlycation.clicked.connect(self.load_glycation)
-        self.btLoadGlycoforms.clicked.connect(self.load_glycoforms)
-        self.btLoadLibrary.clicked.connect(self.load_library)
+        self.btLoadGlycation.clicked.connect(lambda: self.load_glycation())
+        self.btLoadGlycoforms.clicked.connect(lambda: self.load_glycoforms())
+        self.btLoadLibrary.clicked.connect(lambda: self.load_library())
         self.btQuit.clicked.connect(QApplication.instance().quit)
+        self.btSampleData.clicked.connect(self.load_sample_data)
 
         self.sbAggGlycoforms.valueChanged.connect(self.agg_glycoforms)
 
@@ -76,21 +114,42 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             QHeaderView.Fixed)
         self.twLibrary.verticalHeader().setDefaultSectionSize(22)
 
-    def load_glycation(self) -> None:
+        # logger
+        handler = TextEditHandler(self.teLog)
+        handler.setFormatter(logging.Formatter("[%(levelname)s]  %(message)s"))
+        logging.getLogger().addHandler(handler)
+        logging.getLogger().setLevel(logging.INFO)
+
+    def load_sample_data(self):
+        """
+        Load sample input data.
+
+        :return: nothing
+        :rtype: None
+        """
+
+        self.load_glycoforms("data/0_day5_glycoforms.csv")
+        self.load_glycation("data/0_day5_glycation.csv")
+        self.load_library("data/glycan_library.csv")
+
+    def load_glycation(self,
+                       filename: Optional[str]=None) -> None:
         """
         Load glycation data from a CSV file and display it
         in the corresponding chart view.
 
+        :param str filename: directly load this file
         :return: nothing, sets self.se_glycation
         :rtype: None
         """
 
         # load and clean glycation data
-        filename, _, self.last_path = get_filename(
-            self, "open", "Load glycation data …",
-            self.last_path, FileTypes(["csv"]))
         if filename is None:
-            return
+            filename, _, self.last_path = get_filename(
+                self, "open", "Load glycation data …",
+                self.last_path, FileTypes(["csv"]))
+            if filename is None:
+                return
 
         try:
             self.se_glycation = read_clean_datasets(filename)
@@ -149,20 +208,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.lbGlycation.setText("")
 
-    def load_glycoforms(self) -> None:
+    def load_glycoforms(self,
+                        filename: Optional[str]=None) -> None:
         """
         Load glycoform data from a CSV file.
 
+        :param str filename: directly load this file
         :return: nothing, sets self.se_glycoforms
         :rtype: None
         """
 
         # load and clean glycoform data
-        filename, _, self.last_path = get_filename(
-            self, "open", "Load glycoform data …",
-            self.last_path, FileTypes(["csv"]))
         if filename is None:
-            return
+            filename, _, self.last_path = get_filename(
+                self, "open", "Load glycoform data …",
+                self.last_path, FileTypes(["csv"]))
+            if filename is None:
+                return
 
         try:
             self.se_glycoforms = (read_clean_datasets(filename)
@@ -281,19 +343,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.sbAggGlycoforms.setEnabled(False)
         self.agg_glycoforms()
 
-    def load_library(self) -> None:
+    def load_library(self,
+                     filename: Optional[str]=None) -> None:
         """
         Load a glycan library and display in the respective table.
 
+        :param str filename: directly load this file
         :return: nothing, changes self.se_library
         :rtype: None
         """
 
-        filename, _, self.last_path = get_filename(
-            self, "open", "Load glycan library …",
-            self.last_path, FileTypes(["csv"]))
         if filename is None:
-            return
+            filename, _, self.last_path = get_filename(
+                self, "open", "Load glycan library …",
+                self.last_path, FileTypes(["csv"]))
+            if filename is None:
+                return
 
         try:
             self.se_library = read_library(filename)
@@ -309,6 +374,35 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 item = QTableWidgetItem(str(row.iloc[col_id]))
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 self.twLibrary.setItem(row_id, col_id, item)
+
+    def correct_abundances(self) -> None:
+        """
+        Calculate corrected abundances.
+
+        :return: nothing
+        :rtype: None
+        """
+
+        missing_input = ["Please provide the following input data:"]
+        if self.se_glycoforms is None:
+            missing_input.append("glycoforms")
+        if self.se_glycation is None:
+            missing_input.append("glycation")
+        if len(missing_input) > 1:
+            QMessageBox.critical(
+                self, "Error", "\n- ".join(missing_input))
+            return
+
+        logging.info("Correcting dataset  …")
+        QApplication.processEvents()
+        try:
+            G = GlycationGraph(glycan_library=self.se_library,
+                               glycoforms=self.se_glycoforms,
+                               glycation=self.se_glycation)
+            G.correct_abundances()
+        except ValueError as e:
+            QMessageBox.critical(self, "Error", str(e))
+        logging.info("… done!")
 
 
 def _main() -> None:
