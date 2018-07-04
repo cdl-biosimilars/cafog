@@ -172,7 +172,8 @@ class GlycationGraph(nx.DiGraph):
                                       "abundance_error", "corr_abundance",
                                       "corr_abundance_error"])
                   .join(composition.T)
-                  .sort_values("corr_abundance", ascending=False))
+                  .sort_values("corr_abundance", ascending=False)
+                  .reset_index(drop=True))
 
     def to_dot(self,
                filename: str) -> None:
