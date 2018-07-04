@@ -191,6 +191,7 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "Composition"))
         self.btLoadLibrary.setText(_translate("MainWindow", "Load …"))
         self.groupBox_4.setTitle(_translate("MainWindow", "Results"))
+        self.twResults.setSortingEnabled(True)
         item = self.twResults.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Glycoform"))
         item = self.twResults.horizontalHeaderItem(1)

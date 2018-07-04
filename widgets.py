@@ -1,5 +1,53 @@
 import os
-from PyQt5.QtWidgets import QFileDialog
+from typing import Dict, List, Optional, Tuple, Union
+
+from PyQt5.QtWidgets import QFileDialog, QTableWidgetItem, QWidget
+
+_TypeList = Optional[
+                Union[
+                    List[Tuple[str, str]],
+                    Dict[str, str],
+                    List[str]
+                ]
+            ]
+
+
+class SortableTableWidgetItem(QTableWidgetItem):
+    """
+    A :class:`QTableWidgetItem` which supports numerical sorting.
+
+    .. automethod:: __init__
+    .. automethod:: __lt__
+    """
+
+    def __init__(self,
+                 text: str) -> None:
+        """
+        Create a new sortable table widget item.
+
+        :param str text: contents of the item
+        :return: nothing
+        :rtype: None
+        """
+
+        super().__init__(text)
+
+    def __lt__(self,
+               other: "SortableTableWidgetItem") -> bool:
+        """
+        Compare two items.
+
+        :param SortableTableWidgetItem other: item to which self is compared
+        :return: True if self is less than other
+        :rtype: bool
+        """
+
+        key1 = self.text()
+        key2 = other.text()
+        try:
+            return float(key1) < float(key2)
+        except ValueError:
+            return key1 < key2
 
 
 class FileTypes:
@@ -20,7 +68,8 @@ class FileTypes:
         "": ("", "all files")
     }
 
-    def __init__(self, type_list=None):
+    def __init__(self,
+                 type_list: _TypeList=None) -> None:
         """
         Create a new :class:`FileTypes` object.
 
@@ -28,8 +77,9 @@ class FileTypes:
                           or {ext: description} dict
                           or list of extensions, which are then filtered
                           from ``_default_file_types``
-        :type type_list: list(tuple) or dict or list(str)
+        :type type_list: list(tuple(str, str)) or dict or list(str)
         :return: nothing
+        :rtype: None
         :raise TypeError: if an invalid type was specified for ``ext_list``
         """
 
@@ -57,7 +107,7 @@ class FileTypes:
         self.filters = ["{1} [{0}] (*.{0})".format(k, v)
                         for k, v in self.types]
 
-    def get_filter(self):
+    def get_filter(self) -> str:
         """
         Returns  a file filter suitable for the ``filter`` parameter of
         :class:`~PyQt5.QtWidgets.QFileDialog`.
@@ -68,7 +118,8 @@ class FileTypes:
 
         return ";;".join(self.filters)
 
-    def get_type(self, filefilter):
+    def get_type(self,
+                 filefilter: str) -> Tuple[str, str]:
         """
         Returns the extension and description associated with a file filter.
 
@@ -80,8 +131,13 @@ class FileTypes:
         return self.types[self.filters.index(filefilter)]
 
 
-def get_filename(parent, kind="save", caption="", directory="",
-                 file_types=None):
+def get_filename(parent: QWidget,
+                 kind: str="save",
+                 caption: str="",
+                 directory: str="",
+                 file_types: Optional[FileTypes]=None) -> Tuple[Optional[str],
+                                                                Optional[str],
+                                                                str]:
     """
     Get a filename by a :class:`QFileDialog`
     and automatically add extensions.

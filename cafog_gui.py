@@ -15,7 +15,7 @@ from PyQt5.QtWidgets import (QApplication, QHeaderView, QMainWindow,
 from correction import GlycationGraph, read_clean_datasets, read_library
 
 from main_window import Ui_MainWindow
-from widgets import FileTypes, get_filename
+from widgets import FileTypes, SortableTableWidgetItem, get_filename
 
 
 class TextEditHandler(logging.Handler):
@@ -415,12 +415,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.twResults.clearContents()
         for row_id, row in self.results.iterrows():
             self.twResults.insertRow(row_id)
-            item = QTableWidgetItem(row.iloc[0].split(" or ", 1)[0])
+            item = SortableTableWidgetItem(row.iloc[0].split(" or ", 1)[0])
             item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
             self.twResults.setItem(row_id, 0, item)
 
             for col_id in range(1, 5):
-                item = QTableWidgetItem("{:.2f}".format(row.iloc[col_id]))
+                item = SortableTableWidgetItem("{:.2f}".format(row.iloc[col_id]))
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 self.twResults.setItem(row_id, col_id, item)
 
