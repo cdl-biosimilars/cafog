@@ -243,6 +243,9 @@
        </item>
        <item>
         <widget class="QTableWidget" name="twResults">
+         <attribute name="horizontalHeaderDefaultSectionSize">
+          <number>70</number>
+         </attribute>
          <column>
           <property name="text">
            <string>Glycoform</string>
@@ -250,7 +253,7 @@
          </column>
          <column>
           <property name="text">
-           <string>Abundance</string>
+           <string>Observed</string>
           </property>
          </column>
          <column>
@@ -260,12 +263,12 @@
          </column>
          <column>
           <property name="text">
-           <string>Correct abundance</string>
+           <string>Actual</string>
           </property>
          </column>
          <column>
           <property name="text">
-           <string>ErrorNew Column</string>
+           <string>Error</string>
           </property>
          </column>
         </widget>

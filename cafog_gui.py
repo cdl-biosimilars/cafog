@@ -79,6 +79,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.se_glycoforms_agg = None
         self.se_library = None
         self.last_path = None
+        self.results = None
 
         # actions
         self.cbAggGlycoforms.clicked.connect(self.toggle_agg_glycoforms)
@@ -113,6 +114,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.twLibrary.verticalHeader().setSectionResizeMode(
             QHeaderView.Fixed)
         self.twLibrary.verticalHeader().setDefaultSectionSize(22)
+        self.twResults.horizontalHeader().setSectionResizeMode(
+            0, QHeaderView.Stretch)
+        self.twResults.verticalHeader().setDefaultSectionSize(22)
 
         # logger
         handler = TextEditHandler(self.teLog)
@@ -379,7 +383,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         Calculate corrected abundances.
 
-        :return: nothing
+        :return: nothing, sets self.results
         :rtype: None
         """
 
@@ -400,9 +404,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                glycoforms=self.se_glycoforms,
                                glycation=self.se_glycation)
             G.correct_abundances()
+            self.results = G.to_dataframe()
         except ValueError as e:
             QMessageBox.critical(self, "Error", str(e))
         logging.info("… done!")
+        self.show_results()
+
+    def show_results(self):
+        # fill the table
+        self.twResults.clearContents()
+        for row_id, row in self.results.iterrows():
+            self.twResults.insertRow(row_id)
+            item = QTableWidgetItem(row.iloc[0].split(" or ", 1)[0])
+            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            self.twResults.setItem(row_id, 0, item)
+
+            for col_id in range(1, 5):
+                item = QTableWidgetItem("{:.2f}".format(row.iloc[col_id]))
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                self.twResults.setItem(row_id, col_id, item)
 
 
 def _main() -> None:
