@@ -155,6 +155,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if filename is None:
                 return
 
+        logging.info("Loading glycation data in '{}'".format(filename))
         try:
             self.se_glycation = read_clean_datasets(filename)
         except (OSError, ValueError) as e:
@@ -230,6 +231,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if filename is None:
                 return
 
+        logging.info("Loading glycoform data in '{}'".format(filename))
         try:
             self.se_glycoforms = (read_clean_datasets(filename)
                                   .sort_values(ascending=False))
@@ -364,6 +366,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if filename is None:
                 return
 
+        logging.info("Loading glycan library in '{}'".format(filename))
         try:
             self.se_library = read_library(filename)
         except (OSError, ValueError) as e:
