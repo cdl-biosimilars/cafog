@@ -5,9 +5,7 @@ import logging
 import os
 import sys
 
-from correction import (read_clean_datasets, read_library,
-                        calc_glycation_graph, correct_abundances,
-                        save_glycoform_list, save_graph)
+from correction import GlycationGraph, read_clean_datasets, read_library
 
 
 if __name__ == "__main__":
@@ -55,10 +53,13 @@ if __name__ == "__main__":
     # assemble the glycation graph, correct abundances and store
     logging.info("Correcting dataset '{}' …".format(args.glycoforms))
     try:
-        G = calc_glycation_graph(glycan_library, glycoforms, glycation)
-        correct_abundances(G)
-        save_glycoform_list(G, dataset_name)
-        save_graph(G, dataset_name, args.output_format)
+        G = GlycationGraph(glycan_library, glycoforms, glycation)
+        G.correct_abundances()
+        G.to_csv(dataset_name)
+        if args.output_format == "dot":
+            G.to_dot(dataset_name)
+        elif args.output_format == "gexf":
+            G.to_gexf(dataset_name)
     except ValueError as e:
         logging.error(e)
         sys.exit(1)
