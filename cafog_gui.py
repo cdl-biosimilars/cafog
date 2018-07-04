@@ -375,7 +375,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # fill the table
         self.twLibrary.clearContents()
-        for row_id, row in self.se_library.iterrows():
+        for row_id, row in self.se_library.fillna("").iterrows():
             self.twLibrary.insertRow(row_id)
             for col_id in (0, 1):
                 item = QTableWidgetItem(str(row.iloc[col_id]))
