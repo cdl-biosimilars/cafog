@@ -77,17 +77,16 @@ class GlycationGraph(nx.DiGraph):
             if glycans_only_in_library:
                 logging.warning(
                     "The following glycans only appear in the glycan library, "
-                    + "but not in the list of glycoforms: "
-                    + str(glycans_only_in_library)
-                    + ".")
+                    "but not in the list of glycoforms: {}."
+                    .format(", ".join(glycans_only_in_library)))
 
             glycans_only_in_glycoforms = glycoform_glycans - library_glycans
             if glycans_only_in_glycoforms:
                 logging.warning(
                     "The following glycans only appear in the list of "
-                    + "glycoforms, but not in the glycan library: "
-                    + str(glycans_only_in_glycoforms)
-                    + ". They will be added to the library.")
+                    "glycoforms, but not in the glycan library: {}. "
+                    "They will be added to the library."
+                    .format(", ".join(glycans_only_in_glycoforms)))
                 for g in glycans_only_in_glycoforms:
                     try:
                         gp.add_glycan(g)
