@@ -80,9 +80,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.se_library = None
         self.last_path = None
         self.results = None
+        self.results_agg = None
 
         # actions
         self.cbAggGlycoforms.clicked.connect(self.toggle_agg_glycoforms)
+        self.cbAggResults.clicked.connect(self.toggle_agg_results)
 
         self.btCorrect.clicked.connect(self.correct_abundances)
         self.btHelp.clicked.connect(lambda: QWhatsThis.enterWhatsThisMode())
@@ -93,6 +95,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.btSampleData.clicked.connect(self.load_sample_data)
 
         self.sbAggGlycoforms.valueChanged.connect(self.agg_glycoforms)
+        self.sbAggResults.valueChanged.connect(self.agg_results)
 
         # GUI modifications
         self.cvGlycation.chart().setBackgroundRoundness(0)
@@ -110,6 +113,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lbGlycation.setText("")
 
         self.lbGlycoform.setText("")
+
+        self.lbResults.setText("")
 
         self.twLibrary.verticalHeader().setSectionResizeMode(
             QHeaderView.Fixed)
@@ -423,9 +428,117 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.twResults.setItem(row_id, 0, item)
 
             for col_id in range(1, 5):
-                item = SortableTableWidgetItem("{:.2f}".format(row.iloc[col_id]))
+                item = SortableTableWidgetItem(
+                    "{:.2f}".format(row.iloc[col_id]))
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 self.twResults.setItem(row_id, col_id, item)
+
+        # create chart
+        for widget in (self.cbAggResults,
+                       self.sbAggResults,
+                       self.lbAggResults):
+            widget.setEnabled(True)
+        self.sbAggResults.setMaximum(len(self.results) - 2)
+        self.agg_results()
+
+    def update_results_label(self,
+                             hover: bool,
+                             bar_index: int) -> None:
+        """
+        Display information on abundance of the bars under the cursor.
+
+        :param bool hover: True if the mouse hovers over a bar; false otherwise
+        :param int bar_index: index of the bar that triggered the signal
+        :return: nothing
+        :rtype: None
+        """
+
+        if hover:
+            self.lbResults.setText(
+                "{}: observed <b>{:.2f}</b> ± {:.2f} %, "
+                "corrected <b>{:.2f}</b> ± {:.2f} %".format(
+                    self.results_agg.iloc[bar_index, 0]
+                        .split(" or ", 1)[0],
+                    self.results_agg.iloc[bar_index, 1],
+                    self.results_agg.iloc[bar_index, 2],
+                    self.results_agg.iloc[bar_index, 3],
+                    self.results_agg.iloc[bar_index, 4]))
+        else:
+            self.lbResults.setText("")
+
+    def agg_results(self) -> None:
+        """
+        Display results in the corresponding chart view.
+
+        :return: nothing
+        :rtype: None
+        """
+
+        # aggregate "other" abundances
+        if self.cbAggResults.isChecked():
+            agg_abundance = (self.results
+                             .iloc[self.sbAggResults.value():]
+                             .sum())
+            agg_abundance["glycoform"] = "other"
+            self.results_agg = (
+                self.results
+                    .iloc[:self.sbAggResults.value()]
+                    .append(agg_abundance, ignore_index=True))
+        else:
+            self.results_agg = self.results
+
+        # extract x- and y-values from series
+        x_values = list(self.results_agg["glycoform"].str.split(" or").str[0])
+        y_values_obs = list(self.results_agg["abundance"])
+        y_values_cor = list(self.results_agg["corr_abundance"])
+
+        # assemble the chart
+        bar_set_obs = QBarSet("observed abundance")
+        bar_set_obs.append(y_values_obs)
+        bar_set_obs.hovered.connect(self.update_results_label)
+        bar_set_cor = QBarSet("corrected abundance")
+        bar_set_cor.append(y_values_cor)
+        bar_set_cor.hovered.connect(self.update_results_label)
+        bar_series = QBarSeries()
+        bar_series.append([bar_set_obs, bar_set_cor])
+
+        x_axis = QBarCategoryAxis()
+        x_axis.append(x_values)
+        x_axis.setTitleVisible(False)
+        x_axis.setLabelsAngle(270)
+
+        y_axis = QValueAxis()
+        y_axis.setRange(
+            min(self.results_agg["abundance"].min(),
+                self.results_agg["corr_abundance"].min()),
+            max(self.results_agg["abundance"].max(),
+                self.results_agg["corr_abundance"].max()))
+        y_axis.setTitleText("abundance")
+        y_axis.setLabelFormat("%d")
+
+        chart = QChart()
+        chart.addSeries(bar_series)
+        chart.setAxisX(x_axis, bar_series)
+        chart.setAxisY(y_axis, bar_series)
+        chart.legend().setVisible(False)
+        chart.setBackgroundRoundness(0)
+        chart.layout().setContentsMargins(0, 0, 0, 0)
+        chart.setMargins(QMargins(5, 5, 5, 5))
+        self.cvResults.setChart(chart)
+
+    def toggle_agg_results(self) -> None:
+        """
+        Enable or disable the agg results spinbox.
+
+        :return: nothing
+        :rtype: None
+        """
+
+        if self.cbAggResults.isChecked():
+            self.sbAggResults.setEnabled(True)
+        else:
+            self.sbAggResults.setEnabled(False)
+        self.agg_results()
 
 
 def _main() -> None:
