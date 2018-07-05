@@ -58,9 +58,9 @@ if __name__ == "__main__":
         G.to_dataframe().to_csv("{}_corr.csv".format(dataset_name),
                                 index=False)
         if args.output_format == "dot":
-            G.to_dot(dataset_name)
+            G.to_dot("{}_corr.gv".format(dataset_name))
         elif args.output_format == "gexf":
-            G.to_gexf(dataset_name)
+            G.to_gexf("{}_corr.gexf".format(dataset_name))
     except ValueError as e:
         logging.error(e)
         sys.exit(1)

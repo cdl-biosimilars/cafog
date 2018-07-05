@@ -193,7 +193,7 @@ class GlycationGraph(nx.DiGraph):
             new_label = "{}: {:.2%}".format(
                 self[source][sink]["label"], self[source][sink]["c"])
             self[source][sink]["label"] = new_label
-        nx.nx_pydot.write_dot(self, "{}_corr.gv".format(filename))
+        nx.nx_pydot.write_dot(self, filename)
 
     def to_gexf(self,
                 filename: str) -> None:
@@ -220,7 +220,7 @@ class GlycationGraph(nx.DiGraph):
                 self[source][sink]["c"].std_dev)
             self[source][sink]["c"] = float(
                 self[source][sink]["c"].nominal_value)
-        nx.write_gexf(self, "{}_corr.gexf".format(filename))
+        nx.write_gexf(self, filename)
 
 
 def read_clean_datasets(filename: str) -> pd.Series:
