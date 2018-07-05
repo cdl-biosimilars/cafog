@@ -76,10 +76,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
         # instance attributes
-        self.se_glycation = None
-        self.se_glycoforms = None
-        self.se_glycoforms_agg = None
-        self.se_library = None
+        self.glycation = None
+        self.glycoforms = None
+        self.glycoforms_agg = None
+        self.library = None
         self.last_path = None
         self.results = None
         self.results_agg = None
@@ -167,19 +167,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         logging.info("Loading glycation data in '{}'".format(filename))
         try:
-            self.se_glycation = read_clean_datasets(filename)
+            self.glycation = read_clean_datasets(filename)
         except (OSError, ValueError) as e:
             QMessageBox.critical(self, "Error", str(e))
             return
 
         # extract x- and y-values from series
-        x_values = [str(i) for i in self.se_glycation.index]
-        y_values = [a.nominal_value for a in self.se_glycation]
+        x_values = [str(i) for i in self.glycation.index]
+        y_values = [a.nominal_value for a in self.glycation]
 
         # assemble the chart
         bar_set = QBarSet("glycation abundance")
         bar_set.append(y_values)
-        bar_set.setColor(QColor("#2c7fb8"))
+        bar_set.setColor(QColor("#41b6c4"))
         bar_set.hovered.connect(self.update_glycation_label)
         bar_series = QBarSeries()
         bar_series.append(bar_set)
@@ -219,8 +219,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if hover:
             self.lbGlycation.setText(
                 "Abundance: <b>{:.2f}</b> ± {:.2f} %".format(
-                    self.se_glycation[bar_index].nominal_value,
-                    self.se_glycation[bar_index].std_dev))
+                    self.glycation[bar_index].nominal_value,
+                    self.glycation[bar_index].std_dev))
         else:
             self.lbGlycation.setText("")
 
@@ -244,8 +244,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         logging.info("Loading glycoform data in '{}'".format(filename))
         try:
-            self.se_glycoforms = (read_clean_datasets(filename)
-                                  .sort_values(ascending=False))
+            self.glycoforms = (read_clean_datasets(filename)
+                               .sort_values(ascending=False))
         except (OSError, ValueError) as e:
             QMessageBox.critical(self, "Error", str(e))
             return
@@ -254,7 +254,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                        self.sbAggGlycoforms,
                        self.lbAggGlycoforms):
             widget.setEnabled(True)
-        self.sbAggGlycoforms.setMaximum(len(self.se_glycoforms) - 2)
+        self.sbAggGlycoforms.setMaximum(len(self.glycoforms) - 2)
         self.agg_glycoforms()
 
     def update_glycoform_label(self,
@@ -273,9 +273,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if hover:
             self.lbGlycoform.setText(
                 "{}: <b>{:.2f}</b> ± {:.2f} %".format(
-                    self.se_glycoforms_agg.index[bar_index],
-                    self.se_glycoforms_agg[bar_index].nominal_value,
-                    self.se_glycoforms_agg[bar_index].std_dev))
+                    self.glycoforms_agg.index[bar_index],
+                    self.glycoforms_agg[bar_index].nominal_value,
+                    self.glycoforms_agg[bar_index].std_dev))
         else:
             self.lbGlycoform.setText("")
 
@@ -307,19 +307,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # aggregate "other" abundances
         if self.cbAggGlycoforms.isChecked():
-            agg_abundance = (self.se_glycoforms
+            agg_abundance = (self.glycoforms
                              .iloc[self.sbAggGlycoforms.value():]
                              .sum())
-            self.se_glycoforms_agg = (
-                self.se_glycoforms
+            self.glycoforms_agg = (
+                self.glycoforms
                     .iloc[:self.sbAggGlycoforms.value()]
                     .append(pd.Series(agg_abundance, index=["other"])))
         else:
-            self.se_glycoforms_agg = self.se_glycoforms
+            self.glycoforms_agg = self.glycoforms
 
         # extract x- and y-values from series
-        x_values = [str(i) for i in self.se_glycoforms_agg.index]
-        y_values = [a.nominal_value for a in self.se_glycoforms_agg]
+        x_values = [str(i) for i in self.glycoforms_agg.index]
+        y_values = [a.nominal_value for a in self.glycoforms_agg]
 
         # assemble the chart
         bar_set = QBarSet("glycoform abundance")
@@ -334,7 +334,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         x_axis.setTitleVisible(False)
         x_axis.setLabelsAngle(270)
 
-        range_max = max(self.se_glycoforms_agg).nominal_value
+        range_max = max(self.glycoforms_agg).nominal_value
         range_max = math.ceil(range_max / 20) * 20
         tick_count = range_max // 20 + 1
         y_axis = QValueAxis()
@@ -386,14 +386,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         logging.info("Loading glycan library in '{}'".format(filename))
         try:
-            self.se_library = read_library(filename)
+            self.library = read_library(filename)
         except (OSError, ValueError) as e:
             QMessageBox.critical(self, "Error", str(e))
             return
 
         # fill the table
         self.twLibrary.clearContents()
-        for row_id, row in self.se_library.fillna("").iterrows():
+        for row_id, row in self.library.fillna("").iterrows():
             self.twLibrary.insertRow(row_id)
             for col_id in (0, 1):
                 item = QTableWidgetItem(str(row.iloc[col_id]))
@@ -409,9 +409,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
 
         missing_input = ["Please provide the following input data:"]
-        if self.se_glycoforms is None:
+        if self.glycoforms is None:
             missing_input.append("glycoforms")
-        if self.se_glycation is None:
+        if self.glycation is None:
             missing_input.append("glycation")
         if len(missing_input) > 1:
             QMessageBox.critical(
@@ -421,9 +421,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         logging.info("Correcting dataset  …")
         QApplication.processEvents()
         try:
-            G = GlycationGraph(glycan_library=self.se_library,
-                               glycoforms=self.se_glycoforms,
-                               glycation=self.se_glycation)
+            G = GlycationGraph(glycan_library=self.library,
+                               glycoforms=self.glycoforms,
+                               glycation=self.glycation)
             G.correct_abundances()
             self.results = G.to_dataframe()
         except ValueError as e:
@@ -543,7 +543,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # assemble the chart
         bar_set_obs = QBarSet("observed")
         bar_set_obs.append(y_values_obs)
-        bar_set_obs.setColor(QColor("#41b6c4"))
+        bar_set_obs.setColor(QColor("#2c7fb8"))
         bar_set_obs.hovered.connect(self.update_results_label)
         bar_set_cor = QBarSet("corrected")
         bar_set_cor.append(y_values_cor)
