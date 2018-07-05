@@ -111,6 +111,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.cvResults.chart().setBackgroundRoundness(0)
         self.cvResults.chart().layout().setContentsMargins(0, 0, 0, 0)
+        self.cvResults.setRubberBand(QChartView.HorizontalRubberBand)
+        self.old_re_mouse_release_event = self.cvResults.mouseReleaseEvent
+        self.cvResults.mouseReleaseEvent = self.zoom_results_graph
 
         self.lbGlycation.setText("")
 
@@ -492,6 +495,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     self.results_agg.iloc[bar_index, 4]))
         else:
             self.lbResults.setText("")
+
+    def zoom_results_graph(self,
+                           e: QMouseEvent) -> None:
+        """
+        Correctly reset zoom of results bar chart on richt click.
+
+        :param QMouseEvent e: mouse event that triggered the signal
+        :return: nothing
+        :rtype: None
+        """
+
+        if e.button() == Qt.RightButton:
+            x_axis = self.cvResults.chart().axisX()
+            if x_axis is not None:
+                x_axis.setRange(x_axis.categories()[0],
+                                x_axis.categories()[-1])
+            return
+        self.old_re_mouse_release_event(e)
 
     def agg_results(self) -> None:
         """
