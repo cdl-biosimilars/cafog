@@ -308,6 +308,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.se_glycoforms
                     .iloc[:self.sbAggGlycoforms.value()]
                     .append(pd.Series(agg_abundance, index=["other"])))
+        else:
+            self.se_glycoforms_agg = self.se_glycoforms
 
         # extract x- and y-values from series
         x_values = [str(i) for i in self.se_glycoforms_agg.index]
@@ -418,7 +420,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         logging.info("… done!")
         self.show_results()
 
-    def show_results(self):
+    def show_results(self) -> None:
+        """
+        Show correction results in the table
+        and call the chart creating method.
+
+        :return: nothing
+        :rtype: None
+        """
+
         # fill the table
         self.twResults.clearContents()
         for row_id, row in self.results.iterrows():
