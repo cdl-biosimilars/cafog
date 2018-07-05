@@ -78,10 +78,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # instance attributes
         self.glycation = None
+        self.glycation_graph = None
         self.glycoforms = None
         self.glycoforms_agg = None
-        self.library = None
         self.last_path = None
+        self.library = None
         self.results = None
         self.results_agg = None
 
@@ -96,7 +97,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.btLoadLibrary.clicked.connect(lambda: self.load_library())
         self.btQuit.clicked.connect(QApplication.instance().quit)
         self.btSampleData.clicked.connect(self.load_sample_data)
-        self.btSave.clicked.connect(self.save_results)
+        self.btSaveGraph.clicked.connect(self.save_graph)
+        self.btSaveResults.clicked.connect(self.save_results)
 
         self.sbAggGlycoforms.valueChanged.connect(self.agg_glycoforms)
         self.sbAggResults.valueChanged.connect(self.agg_results)
@@ -423,11 +425,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         logging.info("Correcting dataset  …")
         QApplication.processEvents()
         try:
-            G = GlycationGraph(glycan_library=self.library,
-                               glycoforms=self.glycoforms,
-                               glycation=self.glycation)
-            G.correct_abundances()
-            self.results = G.to_dataframe()
+            self.glycation_graph = GlycationGraph(glycan_library=self.library,
+                                                  glycoforms=self.glycoforms,
+                                                  glycation=self.glycation)
+            self.glycation_graph.correct_abundances()
+            self.results = self.glycation_graph.to_dataframe()
         except ValueError as e:
             QMessageBox.critical(self, "Error", str(e))
         logging.info("… done!")
@@ -469,7 +471,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for widget in (self.cbAggResults,
                        self.sbAggResults,
                        self.lbAggResults,
-                       self.btSave):
+                       self.btSaveResults,
+                       self.btSaveGraph):
             widget.setEnabled(True)
         self.sbAggResults.setMaximum(len(self.results) - 2)
         self.agg_results()
@@ -634,6 +637,30 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     target=output_rect,
                     mode=Qt.IgnoreAspectRatio)
                 painter.end()
+        except (OSError, ValueError) as e:
+            QMessageBox.critical(self, "Error", str(e))
+            return
+
+    def save_graph(self) -> None:
+        """
+        Save the glycation graph.
+
+        :return: nothing
+        :rtype: None
+        """
+
+        filename, self.last_path = get_filename(
+            self, "save", "Save glycation graph …",
+            self.last_path, FileTypes(["gv", "gexf"]))
+        if filename is None:
+            return
+
+        logging.info("Saving glycationg graph to '{}'".format(filename))
+        try:
+            if filename.endswith("gv"):
+                self.glycation_graph.to_dot(filename)
+            elif filename.endswith("gexf"):
+                self.glycation_graph.to_gexf(filename)
         except (OSError, ValueError) as e:
             QMessageBox.critical(self, "Error", str(e))
             return
