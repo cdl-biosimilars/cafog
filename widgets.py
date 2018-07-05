@@ -65,6 +65,10 @@ class FileTypes:
         "xls": ("xls", "Excel 97-2003"),
         "xlsx": ("xlsx", "Excel"),
         "csv": ("csv", "Comma-separated value"),
+        "png": ("png", "Portable network graphics"),
+        "svg": ("svg", "Scalable vector graphics"),
+        "gv": ("gv", "GraphViz DOT"),
+        "gexf": ("gexf", "Graph exchange XML format"),
         "": ("", "all files")
     }
 
@@ -136,7 +140,6 @@ def get_filename(parent: QWidget,
                  caption: str="",
                  directory: str="",
                  file_types: Optional[FileTypes]=None) -> Tuple[Optional[str],
-                                                                Optional[str],
                                                                 str]:
     """
     Get a filename by a :class:`QFileDialog`
@@ -147,9 +150,8 @@ def get_filename(parent: QWidget,
     :param str caption: caption of the dialog
     :param str directory: initial directory
     :param FileTypes file_types: file extensions
-    :return: the file name with extension, the description
-             of the used filetype and the last path
-    :rtype: tuple(str, str, str)
+    :return: the file name with extension and the last path
+    :rtype: tuple(str, str)
     :raise ValueError: if an invalid value was supplied to ``kind``
     """
 
@@ -171,9 +173,9 @@ def get_filename(parent: QWidget,
     new_path = os.path.split(filename)[0]
 
     if not filename:
-        return None, None, new_path
+        return None, new_path
 
-    ext, desc = file_types.get_type(used_filter)
+    ext, _ = file_types.get_type(used_filter)
     if not filename.endswith(ext):
         filename += "." + ext
-    return filename, desc, new_path
+    return filename, new_path

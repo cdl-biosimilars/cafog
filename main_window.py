@@ -179,6 +179,7 @@ class Ui_MainWindow(object):
         self.btCorrect.setObjectName("btCorrect")
         self.horizontalLayout_6.addWidget(self.btCorrect)
         self.btSave = QtWidgets.QPushButton(self.centralwidget)
+        self.btSave.setEnabled(False)
         self.btSave.setObjectName("btSave")
         self.horizontalLayout_6.addWidget(self.btSave)
         spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)

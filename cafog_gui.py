@@ -8,8 +8,9 @@ import pandas as pd
 from PyQt5.QtChart import (QBarCategoryAxis, QBarSeries, QBarSet,
                            QChart, QChartView, QValueAxis)
 from PyQt5.QtCore import (Qt, QLibraryInfo, QLocale, QMargins,
-                          QTranslator)
-from PyQt5.QtGui import QMouseEvent, QColor
+                          QRectF, QSize, QTranslator)
+from PyQt5.QtGui import QMouseEvent, QColor, QPainter
+from PyQt5.QtSvg import QSvgGenerator
 from PyQt5.QtWidgets import (QApplication, QHeaderView, QMainWindow,
                              QMessageBox, QTableWidgetItem, QTextEdit,
                              QWhatsThis, QWidget)
@@ -95,6 +96,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.btLoadLibrary.clicked.connect(lambda: self.load_library())
         self.btQuit.clicked.connect(QApplication.instance().quit)
         self.btSampleData.clicked.connect(self.load_sample_data)
+        self.btSave.clicked.connect(self.save_results)
 
         self.sbAggGlycoforms.valueChanged.connect(self.agg_glycoforms)
         self.sbAggResults.valueChanged.connect(self.agg_results)
@@ -159,7 +161,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # load and clean glycation data
         if filename is None:
-            filename, _, self.last_path = get_filename(
+            filename, self.last_path = get_filename(
                 self, "open", "Load glycation data …",
                 self.last_path, FileTypes(["csv"]))
             if filename is None:
@@ -236,7 +238,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # load and clean glycoform data
         if filename is None:
-            filename, _, self.last_path = get_filename(
+            filename, self.last_path = get_filename(
                 self, "open", "Load glycoform data …",
                 self.last_path, FileTypes(["csv"]))
             if filename is None:
@@ -378,7 +380,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
 
         if filename is None:
-            filename, _, self.last_path = get_filename(
+            filename, self.last_path = get_filename(
                 self, "open", "Load glycan library …",
                 self.last_path, FileTypes(["csv"]))
             if filename is None:
@@ -466,7 +468,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # create chart
         for widget in (self.cbAggResults,
                        self.sbAggResults,
-                       self.lbAggResults):
+                       self.lbAggResults,
+                       self.btSave):
             widget.setEnabled(True)
         self.sbAggResults.setMaximum(len(self.results) - 2)
         self.agg_results()
@@ -594,6 +597,46 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.sbAggResults.setEnabled(False)
         self.agg_results()
+
+    def save_results(self) -> None:
+        """
+        Save results chart or table.
+
+        :return: nothing
+        :rtype: None
+        """
+
+        filename, self.last_path = get_filename(
+            self, "save", "Save results …",
+            self.last_path, FileTypes(["csv", "png", "svg"]))
+        if filename is None:
+            return
+
+        logging.info("Saving results to '{}'".format(filename))
+        try:
+            if filename.endswith("csv"):
+                self.results.to_csv(filename, index=False)
+            elif filename.endswith("png"):
+                self.cvResults.grab().save(filename)
+            elif filename.endswith("svg"):
+                output_rect = QRectF(
+                    self.cvResults.chart().scene().sceneRect())
+                output_size = QSize(output_rect.size().toSize())
+                svg_generator = QSvgGenerator()
+                svg_generator.setFileName(filename)
+                svg_generator.setSize(output_size)
+                svg_generator.setViewBox(output_rect)
+                painter = QPainter()
+                painter.begin(svg_generator)
+                self.cvResults.chart().scene().render(
+                    painter,
+                    source=output_rect,
+                    target=output_rect,
+                    mode=Qt.IgnoreAspectRatio)
+                painter.end()
+        except (OSError, ValueError) as e:
+            QMessageBox.critical(self, "Error", str(e))
+            return
 
 
 def _main() -> None:

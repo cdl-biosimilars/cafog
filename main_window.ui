@@ -384,6 +384,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="btSave">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Save results …</string>
         </property>
