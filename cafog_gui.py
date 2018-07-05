@@ -7,7 +7,8 @@ import pandas as pd
 
 from PyQt5.QtChart import (QBarCategoryAxis, QBarSeries, QBarSet,
                            QChart, QChartView, QValueAxis)
-from PyQt5.QtCore import Qt, QLibraryInfo, QLocale, QMargins, QTranslator
+from PyQt5.QtCore import (Qt, QLibraryInfo, QLocale, QMargins,
+                          QTranslator)
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import (QApplication, QHeaderView, QMainWindow,
                              QMessageBox, QTableWidgetItem, QTextEdit,
@@ -438,15 +439,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.twResults.clearContents()
         for row_id, row in self.results.iterrows():
             self.twResults.insertRow(row_id)
+
+            # glycoform
             item = SortableTableWidgetItem(row.iloc[0].split(" or ", 1)[0])
             item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
             self.twResults.setItem(row_id, 0, item)
 
+            # abundances and errors
             for col_id in range(1, 5):
                 item = SortableTableWidgetItem(
                     "{:.2f}".format(row.iloc[col_id]))
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 self.twResults.setItem(row_id, col_id, item)
+
+            # change of abundance
+            item = SortableTableWidgetItem(
+                "{:.2f}".format(row.iloc[3] - row.iloc[1]))
+            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            self.twResults.setItem(row_id, 5, item)
 
         # create chart
         for widget in (self.cbAggResults,
@@ -508,10 +518,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         y_values_cor = list(self.results_agg["corr_abundance"])
 
         # assemble the chart
-        bar_set_obs = QBarSet("observed abundance")
+        bar_set_obs = QBarSet("observed")
         bar_set_obs.append(y_values_obs)
         bar_set_obs.hovered.connect(self.update_results_label)
-        bar_set_cor = QBarSet("corrected abundance")
+        bar_set_cor = QBarSet("corrected")
         bar_set_cor.append(y_values_cor)
         bar_set_cor.hovered.connect(self.update_results_label)
         bar_series = QBarSeries()
@@ -540,7 +550,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         chart.addSeries(bar_series)
         chart.setAxisX(x_axis, bar_series)
         chart.setAxisY(y_axis, bar_series)
-        chart.legend().setVisible(False)
+        chart.legend().setContentsMargins(0, 0, 0, 0)
         chart.setBackgroundRoundness(0)
         chart.layout().setContentsMargins(0, 0, 0, 0)
         chart.setMargins(QMargins(5, 5, 5, 5))

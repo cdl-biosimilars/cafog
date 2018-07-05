@@ -276,6 +276,11 @@
              <string>Error</string>
             </property>
            </column>
+           <column>
+            <property name="text">
+             <string>Change</string>
+            </property>
+           </column>
           </widget>
          </item>
         </layout>
