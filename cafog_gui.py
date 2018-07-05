@@ -9,7 +9,7 @@ from PyQt5.QtChart import (QBarCategoryAxis, QBarSeries, QBarSet,
                            QChart, QChartView, QValueAxis)
 from PyQt5.QtCore import (Qt, QLibraryInfo, QLocale, QMargins,
                           QTranslator)
-from PyQt5.QtGui import QMouseEvent
+from PyQt5.QtGui import QMouseEvent, QColor
 from PyQt5.QtWidgets import (QApplication, QHeaderView, QMainWindow,
                              QMessageBox, QTableWidgetItem, QTextEdit,
                              QWhatsThis, QWidget)
@@ -176,6 +176,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # assemble the chart
         bar_set = QBarSet("glycation abundance")
         bar_set.append(y_values)
+        bar_set.setColor(QColor("#2c7fb8"))
         bar_set.hovered.connect(self.update_glycation_label)
         bar_series = QBarSeries()
         bar_series.append(bar_set)
@@ -320,6 +321,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # assemble the chart
         bar_set = QBarSet("glycoform abundance")
         bar_set.append(y_values)
+        bar_set.setColor(QColor("#225ea8"))
         bar_set.hovered.connect(self.update_glycoform_label)
         bar_series = QBarSeries()
         bar_series.append(bar_set)
@@ -520,9 +522,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # assemble the chart
         bar_set_obs = QBarSet("observed")
         bar_set_obs.append(y_values_obs)
+        bar_set_obs.setColor(QColor("#41b6c4"))
         bar_set_obs.hovered.connect(self.update_results_label)
         bar_set_cor = QBarSet("corrected")
         bar_set_cor.append(y_values_cor)
+        bar_set_cor.setColor(QColor("#a1dab4"))
         bar_set_cor.hovered.connect(self.update_results_label)
         bar_series = QBarSeries()
         bar_series.append([bar_set_obs, bar_set_cor])
