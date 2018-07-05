@@ -100,6 +100,7 @@ class FileTypes:
                 for ext, description in type_list:
                     self.types.append((ext, description))
             except (TypeError, ValueError):
+                self.types = []
                 try:  # list of strings
                     for ext in type_list:
                         try:
