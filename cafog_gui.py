@@ -1,4 +1,5 @@
 import logging
+import math
 import sys
 from typing import Optional
 
@@ -327,8 +328,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         x_axis.setTitleVisible(False)
         x_axis.setLabelsAngle(270)
 
+        range_max = max(self.se_glycoforms_agg).nominal_value
+        range_max = math.ceil(range_max / 20) * 20
+        tick_count = range_max // 20 + 1
         y_axis = QValueAxis()
-        y_axis.setRange(0, max(self.se_glycoforms_agg).nominal_value)
+        y_axis.setRange(0, range_max)
+        y_axis.setTickCount(tick_count)
         y_axis.setTitleText("abundance")
         y_axis.setLabelFormat("%d")
 
@@ -517,12 +522,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         x_axis.setTitleVisible(False)
         x_axis.setLabelsAngle(270)
 
+        range_min = min(self.results_agg[["abundance", "corr_abundance"]]
+                            .min().min(),
+                        0)
+        range_min = math.floor(range_min / 20) * 20
+        range_max = (self.results_agg[["abundance", "corr_abundance"]]
+                         .max().max())
+        range_max = math.ceil(range_max / 20) * 20
+        tick_count = (range_max - range_min) // 20 + 1
         y_axis = QValueAxis()
-        y_axis.setRange(
-            min(self.results_agg["abundance"].min(),
-                self.results_agg["corr_abundance"].min()),
-            max(self.results_agg["abundance"].max(),
-                self.results_agg["corr_abundance"].max()))
+        y_axis.setRange(range_min, range_max)
+        y_axis.setTickCount(tick_count)
         y_axis.setTitleText("abundance")
         y_axis.setLabelFormat("%d")
 
