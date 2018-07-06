@@ -14,7 +14,7 @@
    <string>CAFoG - Correct abundances for glycation</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_6">
+   <layout class="QVBoxLayout" name="verticalLayout_7">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
@@ -27,6 +27,9 @@
           <widget class="QChartView" name="cvGlycoforms">
            <property name="whatsThis">
             <string>The whatsthis for the glycoform chart.</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
            </property>
            <property name="renderHints">
             <set>QPainter::Antialiasing|QPainter::TextAntialiasing</set>
@@ -137,6 +140,9 @@
            <property name="whatsThis">
             <string>The whatsthis for the glycation chart.</string>
            </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
            <property name="renderHints">
             <set>QPainter::Antialiasing|QPainter::TextAntialiasing</set>
            </property>
@@ -237,11 +243,45 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_9">
          <item>
-          <widget class="QChartView" name="cvResults">
-           <property name="renderHints">
-            <set>QPainter::Antialiasing|QPainter::TextAntialiasing</set>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <property name="spacing">
+            <number>0</number>
            </property>
-          </widget>
+           <item>
+            <widget class="QChartView" name="cvResults">
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
+             <property name="renderHints">
+              <set>QPainter::Antialiasing|QPainter::TextAntialiasing</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="lbResults">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>15</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QLabel {
+background: rgb(255, 255, 255)
+}</string>
+             </property>
+             <property name="text">
+              <string>(results)</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
           <widget class="QTableWidget" name="twResults">
@@ -334,9 +374,22 @@
           </spacer>
          </item>
          <item>
-          <widget class="QLabel" name="lbResults">
+          <widget class="QPushButton" name="btSaveResults">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
-            <string>(results)</string>
+            <string>Save results …</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btSaveGraph">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Save glycation graph …</string>
            </property>
           </widget>
          </item>
@@ -383,26 +436,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btSaveResults">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Save results …</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btSaveGraph">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Save glycation graph …</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <spacer name="horizontalSpacer_4">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -439,6 +472,10 @@
      </layout>
     </item>
    </layout>
+   <zorder>groupBox_4</zorder>
+   <zorder>groupBox_5</zorder>
+   <zorder></zorder>
+   <zorder>twResults</zorder>
   </widget>
  </widget>
  <customwidgets>

@@ -183,7 +183,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # assemble the chart
         bar_set = QBarSet("glycation abundance")
         bar_set.append(y_values)
-        bar_set.setColor(QColor("#41b6c4"))
+        bar_set.setColor(QColor("#a1dab4"))
         bar_set.hovered.connect(self.update_glycation_label)
         bar_series = QBarSeries()
         bar_series.append(bar_set)
@@ -222,7 +222,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         if hover:
             self.lbGlycation.setText(
-                "Abundance: <b>{:.2f}</b> ± {:.2f} %".format(
+                "{} glycation{}: <b>{:.2f}</b> ± {:.2f} %".format(
+                    "no" if bar_index == 0 else bar_index,
+                    "" if bar_index < 2 else "s",
                     self.glycation[bar_index].nominal_value,
                     self.glycation[bar_index].std_dev))
         else:
@@ -328,7 +330,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # assemble the chart
         bar_set = QBarSet("glycoform abundance")
         bar_set.append(y_values)
-        bar_set.setColor(QColor("#225ea8"))
+        bar_set.setColor(QColor("#2c7fb8"))
         bar_set.hovered.connect(self.update_glycoform_label)
         bar_series = QBarSeries()
         bar_series.append(bar_set)
@@ -476,6 +478,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             widget.setEnabled(True)
         self.sbAggResults.setMaximum(len(self.results) - 2)
         self.agg_results()
+        self.update_results_label(False, 0)
 
     def update_results_label(self,
                              hover: bool,
@@ -491,8 +494,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         if hover:
             self.lbResults.setText(
-                "{}: observed <b>{:.2f}</b> ± {:.2f} %, "
-                "corrected <b>{:.2f}</b> ± {:.2f} %".format(
+                "{}: "
+                "observed <b><font color='#225ea8'>{:.2f}</font></b> "
+                "± {:.2f} %, "
+                "corrected <b><font color='#41b6c4'>{:.2f}</font></b> "
+                "± {:.2f} %".format(
                     self.results_agg.iloc[bar_index, 0]
                         .split(" or ", 1)[0],
                     self.results_agg.iloc[bar_index, 1],
@@ -500,7 +506,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     self.results_agg.iloc[bar_index, 3],
                     self.results_agg.iloc[bar_index, 4]))
         else:
-            self.lbResults.setText("")
+            self.lbResults.setText(
+                "<font color='#225ea8'>&#x25A0;</font> observed"
+                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                "<font color='#41b6c4'>&#x25A0;</font> corrected")
 
     def zoom_results_graph(self,
                            e: QMouseEvent) -> None:
@@ -549,11 +558,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # assemble the chart
         bar_set_obs = QBarSet("observed")
         bar_set_obs.append(y_values_obs)
-        bar_set_obs.setColor(QColor("#2c7fb8"))
+        bar_set_obs.setColor(QColor("#225ea8"))
         bar_set_obs.hovered.connect(self.update_results_label)
         bar_set_cor = QBarSet("corrected")
         bar_set_cor.append(y_values_cor)
-        bar_set_cor.setColor(QColor("#a1dab4"))
+        bar_set_cor.setColor(QColor("#41b6c4"))
         bar_set_cor.hovered.connect(self.update_results_label)
         bar_series = QBarSeries()
         bar_series.append([bar_set_obs, bar_set_cor])
@@ -581,7 +590,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         chart.addSeries(bar_series)
         chart.setAxisX(x_axis, bar_series)
         chart.setAxisY(y_axis, bar_series)
-        chart.legend().setContentsMargins(0, 0, 0, 0)
+        chart.legend().setVisible(False)
         chart.setBackgroundRoundness(0)
         chart.layout().setContentsMargins(0, 0, 0, 0)
         chart.setMargins(QMargins(5, 5, 5, 5))
