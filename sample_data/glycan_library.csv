@@ -1,0 +1,15 @@
+#glycan,composition
+A2G0F,
+A2G1F,
+A2G2F,
+A2G0,
+A2S1G0F,
+A2S1G1F,
+A1G0F,
+A1G1F,
+A1G0,
+A3G0F,
+A3G0,
+A2G2F+1Hex,"6 Hex, 4 HexNAc, 1 Fuc"
+GnF,1 HexNAc
+non-glycosylated,

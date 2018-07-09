@@ -264,6 +264,8 @@ class Ui_MainWindow(object):
         self.btCorrect.setText(_translate("MainWindow", "Correct abundances"))
         self.btSampleData.setText(_translate("MainWindow", "Sample data"))
         self.btHelp.setText(_translate("MainWindow", "Help"))
+        self.btHelp.setShortcut(_translate("MainWindow", "F1"))
         self.btQuit.setText(_translate("MainWindow", "Quit"))
+        self.btQuit.setShortcut(_translate("MainWindow", "Ctrl+Q"))
 
 from PyQt5.QtChart import QChartView

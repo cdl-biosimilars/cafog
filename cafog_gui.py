@@ -177,9 +177,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         :rtype: None
         """
 
-        self.load_glycoforms("data/0_day5_glycoforms.csv")
-        self.load_glycation("data/0_day5_glycation.csv")
-        self.load_library("data/glycan_library.csv")
+        self.load_glycoforms("sample_data/glycoforms.csv")
+        self.load_glycation("sample_data/glycation.csv")
+        self.load_library("sample_data/glycan_library.csv")
 
     def load_glycation(self,
                        filename: Optional[str]=None) -> None:
