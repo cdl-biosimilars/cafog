@@ -9,7 +9,7 @@ from PyQt5.QtChart import (QBarCategoryAxis, QBarSeries, QBarSet,
                            QChart, QChartView, QValueAxis)
 from PyQt5.QtCore import (Qt, QLibraryInfo, QLocale, QMargins,
                           QRectF, QSize, QTranslator)
-from PyQt5.QtGui import QDropEvent, QMouseEvent, QColor, QPainter
+from PyQt5.QtGui import QBrush, QColor, QDropEvent, QMouseEvent, QPainter
 from PyQt5.QtSvg import QSvgGenerator
 from PyQt5.QtWidgets import (QApplication, QHeaderView, QMainWindow,
                              QMessageBox, QTableWidgetItem, QTextEdit,
@@ -120,12 +120,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # GUI modifications
         self.cvGlycation.chart().setBackgroundRoundness(0)
         self.cvGlycation.chart().layout().setContentsMargins(0, 0, 0, 0)
+        drop_hint = self.cvGlycation.scene().addText(
+            self.tr("Drag and drop glycation data\nor click 'Load …'"))
+        drop_hint.setDefaultTextColor(QColor("#888888"))
 
         self.cvGlycoforms.chart().setBackgroundRoundness(0)
         self.cvGlycoforms.chart().layout().setContentsMargins(0, 0, 0, 0)
         self.cvGlycoforms.setRubberBand(QChartView.HorizontalRubberBand)
         self.old_gf_mouse_release_event = self.cvGlycoforms.mouseReleaseEvent
         self.cvGlycoforms.mouseReleaseEvent = self.zoom_glycoform_graph
+        drop_hint = self.cvGlycoforms.scene().addText(
+            self.tr("Drag and drop glycoform data\nor click 'Load …'"))
+        drop_hint.setDefaultTextColor(QColor("#888888"))
 
         self.cvResults.chart().setBackgroundRoundness(0)
         self.cvResults.chart().layout().setContentsMargins(0, 0, 0, 0)
@@ -139,9 +145,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.lbResults.setText("")
 
+        self.twLibrary.horizontalHeader().setVisible(False)
+        self.twLibrary.verticalHeader().setVisible(False)
         self.twLibrary.verticalHeader().setSectionResizeMode(
             QHeaderView.Fixed)
         self.twLibrary.verticalHeader().setDefaultSectionSize(22)
+        self.twLibrary.setRowCount(2)
+        self.twLibrary.setSpan(0, 0, 2, 2)
+        item = QTableWidgetItem(
+            self.tr("Drag and drop glycan library data\n"
+                    "or click 'Load …' (optional)"))
+        item.setFlags(Qt.ItemIsEnabled)
+        item.setForeground(QBrush(QColor("#888888")))
+        self.twLibrary.setItem(0, 0, item)
+
         self.twResults.horizontalHeader().setSectionResizeMode(
             0, QHeaderView.Stretch)
         self.twResults.verticalHeader().setDefaultSectionSize(22)
@@ -434,6 +451,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # fill the table
         self.twLibrary.clearContents()
+        self.twLibrary.setRowCount(0)
+        self.twLibrary.horizontalHeader().setVisible(True)
+        self.twLibrary.verticalHeader().setVisible(True)
         for row_id, row in self.library.fillna("").iterrows():
             self.twLibrary.insertRow(row_id)
             for col_id in (0, 1):
