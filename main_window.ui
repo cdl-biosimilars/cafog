@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1072</width>
-    <height>825</height>
+    <height>821</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -190,6 +190,9 @@
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
           <widget class="QTableWidget" name="twLibrary">
+           <property name="acceptDrops">
+            <bool>true</bool>
+           </property>
            <attribute name="horizontalHeaderStretchLastSection">
             <bool>true</bool>
            </attribute>
@@ -475,7 +478,6 @@ background: rgb(255, 255, 255)
    <zorder>groupBox_4</zorder>
    <zorder>groupBox_5</zorder>
    <zorder></zorder>
-   <zorder>twResults</zorder>
   </widget>
  </widget>
  <customwidgets>

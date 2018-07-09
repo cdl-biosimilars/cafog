@@ -9,7 +9,7 @@ from PyQt5.QtChart import (QBarCategoryAxis, QBarSeries, QBarSet,
                            QChart, QChartView, QValueAxis)
 from PyQt5.QtCore import (Qt, QLibraryInfo, QLocale, QMargins,
                           QRectF, QSize, QTranslator)
-from PyQt5.QtGui import QMouseEvent, QColor, QPainter
+from PyQt5.QtGui import QDropEvent, QMouseEvent, QColor, QPainter
 from PyQt5.QtSvg import QSvgGenerator
 from PyQt5.QtWidgets import (QApplication, QHeaderView, QMainWindow,
                              QMessageBox, QTableWidgetItem, QTextEdit,
@@ -90,6 +90,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.cbAggGlycoforms.clicked.connect(self.toggle_agg_glycoforms)
         self.cbAggResults.clicked.connect(self.toggle_agg_results)
 
+        self.cvGlycation.dragEnterEvent = lambda e: e.accept()
+        self.cvGlycation.dragMoveEvent = lambda e: e.accept()
+        self.cvGlycation.dropEvent = lambda e: self.drop_file(
+            e, self.cvGlycation)
+        self.cvGlycoforms.dragEnterEvent = lambda e: e.accept()
+        self.cvGlycoforms.dragMoveEvent = lambda e: e.accept()
+        self.cvGlycoforms.dropEvent = lambda e: self.drop_file(
+            e, self.cvGlycoforms)
+
         self.btCorrect.clicked.connect(self.correct_abundances)
         self.btHelp.clicked.connect(lambda: QWhatsThis.enterWhatsThisMode())
         self.btLoadGlycation.clicked.connect(lambda: self.load_glycation())
@@ -102,6 +111,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.sbAggGlycoforms.valueChanged.connect(self.agg_glycoforms)
         self.sbAggResults.valueChanged.connect(self.agg_results)
+
+        self.twLibrary.dragEnterEvent = lambda e: e.accept()
+        self.twLibrary.dragMoveEvent = lambda e: e.accept()
+        self.twLibrary.dropEvent = lambda e: self.drop_file(
+            e, self.twLibrary)
 
         # GUI modifications
         self.cvGlycation.chart().setBackgroundRoundness(0)
@@ -206,6 +220,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         chart.layout().setContentsMargins(0, 0, 0, 0)
         chart.setMargins(QMargins(5, 5, 5, 5))
         self.cvGlycation.setChart(chart)
+
+    def drop_file(self,
+                  e: QDropEvent,
+                  source: QWidget) -> None:
+        """
+        Open a file dropped on any of the inpuit data widgets.
+
+        :param QDropEvent e: drop event which prompted calling this function
+        :param QWidget source: widget that received the drop
+        :return: nothing
+        :rtype: None
+        """
+
+        if e.mimeData().hasUrls():
+            filename = e.mimeData().urls()[0].toLocalFile()
+            if source == self.cvGlycoforms:
+                self.load_glycoforms(filename)
+            elif source == self.cvGlycation:
+                self.load_glycation(filename)
+            elif source == self.twLibrary:
+                self.load_library(filename)
 
     def update_glycation_label(self,
                                hover: bool,

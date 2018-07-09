@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1072, 825)
+        MainWindow.resize(1072, 821)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_7 = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -89,6 +89,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.groupBox_3)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.twLibrary = QtWidgets.QTableWidget(self.groupBox_3)
+        self.twLibrary.setAcceptDrops(True)
         self.twLibrary.setObjectName("twLibrary")
         self.twLibrary.setColumnCount(2)
         self.twLibrary.setRowCount(0)
@@ -216,7 +217,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_7.addLayout(self.horizontalLayout_6)
         self.groupBox_4.raise_()
         self.groupBox_5.raise_()
-        self.twResults.raise_()
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
