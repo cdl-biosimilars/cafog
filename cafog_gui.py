@@ -489,6 +489,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.results = self.glycation_graph.to_dataframe()
         except ValueError as e:
             QMessageBox.critical(self, "Error", str(e))
+            return
         logging.info("… done!")
         self.show_results()
 
