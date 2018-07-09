@@ -204,6 +204,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             self.glycation = read_clean_datasets(filename)
         except (OSError, ValueError) as e:
+            logging.error(str(e))
             QMessageBox.critical(self, "Error", str(e))
             return
 
@@ -305,6 +306,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.glycoforms = (read_clean_datasets(filename)
                                .sort_values(ascending=False))
         except (OSError, ValueError) as e:
+            logging.error(str(e))
             QMessageBox.critical(self, "Error", str(e))
             return
 
@@ -446,6 +448,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             self.library = read_library(filename)
         except (OSError, ValueError) as e:
+            logging.error(str(e))
             QMessageBox.critical(self, "Error", str(e))
             return
 
@@ -475,11 +478,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.glycation is None:
             missing_input.append("glycation")
         if len(missing_input) > 1:
+            logging.error(" ".join(missing_input))
             QMessageBox.critical(
                 self, "Error", "\n- ".join(missing_input))
             return
 
         logging.info("Correcting dataset  …")
+        QApplication.setOverrideCursor(Qt.WaitCursor)
         QApplication.processEvents()
         try:
             self.glycation_graph = GlycationGraph(glycan_library=self.library,
@@ -488,10 +493,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.glycation_graph.correct_abundances()
             self.results = self.glycation_graph.to_dataframe()
         except ValueError as e:
+            QApplication.restoreOverrideCursor()
+            logging.error(str(e))
             QMessageBox.critical(self, "Error", str(e))
             return
+
         logging.info("… done!")
         self.show_results()
+        QApplication.restoreOverrideCursor()
 
     def show_results(self) -> None:
         """
@@ -703,6 +712,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     mode=Qt.IgnoreAspectRatio)
                 painter.end()
         except (OSError, ValueError) as e:
+            logging.error(str(e))
             QMessageBox.critical(self, "Error", str(e))
             return
 
@@ -727,6 +737,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             elif filename.endswith("gexf"):
                 self.glycation_graph.to_gexf(filename)
         except (OSError, ValueError) as e:
+            logging.error(str(e))
             QMessageBox.critical(self, "Error", str(e))
             return
 
