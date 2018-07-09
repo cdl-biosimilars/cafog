@@ -8,7 +8,14 @@ import sys
 from correction import GlycationGraph, read_clean_datasets, read_library
 
 
-if __name__ == "__main__":
+def _main() -> None:
+    """
+    Parse command line arguments, correct abundances and write output.
+
+    :return: nothing
+    :rtype: None
+    """
+
     logging.basicConfig(format="%(levelname)s: %(message)s",
                         level=logging.INFO)
 
@@ -66,3 +73,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     logging.info("… done!")
+
+
+if __name__ == "__main__":
+    _main()
