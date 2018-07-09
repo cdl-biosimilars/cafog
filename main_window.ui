@@ -26,7 +26,7 @@
          <item>
           <widget class="QChartView" name="cvGlycoforms">
            <property name="whatsThis">
-            <string>The whatsthis for the glycoform chart.</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Data on glycoforms. Load a dataset from a CSV file by dragging it into the white area or by selecting it after clicking 'Load …'.&lt;/p&gt;&lt;p&gt;The CSV file must contain three columns containing glycoform names, abundances, and experimental errors of abundances, respectively. A header is not allowed, but any line starting with '#' will be discarded.&lt;/p&gt;&lt;p&gt;Format for glycoform names: &amp;quot;glycan 1/glycan 2/…/glycan n&amp;quot;.&lt;br/&gt;The monosaccharide composition for glycans whose name follows the Zhang nomenclature will be deduced automatically. The composition for other glycans must be provided in the glycan library.&lt;/p&gt;&lt;p&gt;Draw a rubberband while pressing the left mouse button to zoom.&lt;br/&gt;Right click to reset zoom.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
@@ -42,6 +42,9 @@
             <widget class="QCheckBox" name="cbAggGlycoforms">
              <property name="enabled">
               <bool>false</bool>
+             </property>
+             <property name="whatsThis">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Aggregate glycoform abundances if the dataset contains more than the specified number of entries. By default, abundances for the seven most abundant glycoforms will be shown; the abundances of the remaining ones will be summed and shown as 'other'.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
               <string>Only display the</string>
@@ -90,6 +93,9 @@
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
             <widget class="QPushButton" name="btLoadGlycoforms">
+             <property name="whatsThis">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load glycoform data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Load …</string>
              </property>
@@ -138,7 +144,7 @@
          <item>
           <widget class="QChartView" name="cvGlycation">
            <property name="whatsThis">
-            <string>The whatsthis for the glycation chart.</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Data on glycation. Load a dataset from a CSV file by dragging it into the white area or by selecting it after clicking 'Load …'.&lt;/p&gt;&lt;p&gt;The CSV file must contain three columns containing glycation counts, abundances, and experimental errors of abundances, respectively. A header is not allowed, but any line starting with '#' will be discarded.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
@@ -152,6 +158,9 @@
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
             <widget class="QPushButton" name="btLoadGlycation">
+             <property name="whatsThis">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load glycation data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Load …</string>
              </property>
@@ -193,6 +202,9 @@
            <property name="acceptDrops">
             <bool>true</bool>
            </property>
+           <property name="whatsThis">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The glycan library. Load a dataset from a CSV file by dragging it into the white area or by selecting it after clicking 'Load …'.&lt;/p&gt;&lt;p&gt;A glycan library is required&lt;br/&gt;- if glycoform data contains glycoforms whose name does not adhere to the Zhang nomenclature. In this case, the monosaccharide composition must be specified.&lt;br/&gt;- if glycoforms do not contain all glycans that should be used for calculateing corrected abundances.&lt;/p&gt;&lt;p&gt;The CSV file must contain two columns containing glycan names and monosaccharide compositions, respectively. A header is not allowed, but any line starting with '#' will be discarded.&lt;/p&gt;&lt;p&gt;Format for the monosaccharide composition like &amp;quot;1 Hex, 2 HexNAc, 3 Fuc&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <attribute name="horizontalHeaderStretchLastSection">
             <bool>true</bool>
            </attribute>
@@ -212,6 +224,9 @@
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
             <widget class="QPushButton" name="btLoadLibrary">
+             <property name="whatsThis">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load a glycan library.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
               <string>Load …</string>
              </property>
@@ -252,6 +267,9 @@
            </property>
            <item>
             <widget class="QChartView" name="cvResults">
+             <property name="whatsThis">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Glycoform abundances before and after correction for influences of glycation.&lt;/p&gt;&lt;p&gt;Draw a rubberband while pressing the left mouse button to zoom.&lt;br/&gt;Right click to reset zoom.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="frameShape">
               <enum>QFrame::NoFrame</enum>
              </property>
@@ -288,6 +306,9 @@ background: rgb(255, 255, 255)
          </item>
          <item>
           <widget class="QTableWidget" name="twResults">
+           <property name="whatsThis">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Glycoform abundances, along with their experimental errors, before and after correction for influences of glycation. &amp;quot;Change&amp;quot; denotes the difference between actual and observed abundance.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="sortingEnabled">
             <bool>true</bool>
            </property>
@@ -335,6 +356,9 @@ background: rgb(255, 255, 255)
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="whatsThis">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Aggregate glycoform abundances if the result contains more than the specified number of entries. By default, abundances for the seven most abundant glycoforms will be shown; the abundances of the remaining ones will be summed and shown as 'other'.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
             <string>Only display the</string>
            </property>
@@ -381,6 +405,9 @@ background: rgb(255, 255, 255)
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="whatsThis">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save either the results chart (in PNG or SVG format) or the results table (in CSV or XLSX format).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
             <string>Save results …</string>
            </property>
@@ -390,6 +417,9 @@ background: rgb(255, 255, 255)
           <widget class="QPushButton" name="btSaveGraph">
            <property name="enabled">
             <bool>false</bool>
+           </property>
+           <property name="whatsThis">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save the glycation graph that was assembled for correcting abundances, either in GraphViz DOT or graph exchange XML format (GEXF).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
             <string>Save glycation graph …</string>
@@ -421,6 +451,9 @@ background: rgb(255, 255, 255)
            <height>80</height>
           </size>
          </property>
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The log of the current session.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="readOnly">
           <bool>true</bool>
          </property>
@@ -433,6 +466,9 @@ background: rgb(255, 255, 255)
      <layout class="QHBoxLayout" name="horizontalLayout_6">
       <item>
        <widget class="QPushButton" name="btCorrect">
+        <property name="whatsThis">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click to correct glycoform abundances from influences of glycation. Requires at least data on glycoforms and glycation to be loaded.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>Correct abundances</string>
         </property>
@@ -453,13 +489,19 @@ background: rgb(255, 255, 255)
       </item>
       <item>
        <widget class="QPushButton" name="btSampleData">
+        <property name="whatsThis">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load an exemplary input dataset (glycoforms, glycation, glycation library). &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
-         <string>Sample data</string>
+         <string>Load sample data</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="btHelp">
+        <property name="whatsThis">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter help mode. In help mode, click on any widget to display a description of its purpose.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>Help</string>
         </property>
@@ -470,6 +512,9 @@ background: rgb(255, 255, 255)
       </item>
       <item>
        <widget class="QPushButton" name="btQuit">
+        <property name="whatsThis">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Quit the application (shortcut: Ctrl+Q).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>Quit</string>
         </property>
