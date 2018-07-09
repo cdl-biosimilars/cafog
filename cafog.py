@@ -19,7 +19,7 @@ if __name__ == "__main__":
                         action="version",
                         help="print the version number",
                         version="%(prog)s 1.0")
-    parser.add_argument("-o", "--output-format",
+    parser.add_argument("-o", "--graph-output-format",
                         action="store",
                         help="graph output format, either 'dot' or 'gexf' ",
                         metavar="FORMAT",
