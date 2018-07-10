@@ -93,9 +93,12 @@
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
             <widget class="QPushButton" name="btLoadGlycoforms">
+<<<<<<< HEAD
              <property name="whatsThis">
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load glycoform data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
+=======
+>>>>>>> 3aee0baf7fb1c81b3dba9ebaba521735c37be8ae
              <property name="text">
               <string>Load …</string>
              </property>
@@ -388,6 +391,13 @@ background: rgb(255, 255, 255)
           </widget>
          </item>
          <item>
+          <widget class="QLabel" name="lbResults">
+           <property name="text">
+            <string>(results)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer name="horizontalSpacer_6">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -400,6 +410,7 @@ background: rgb(255, 255, 255)
            </property>
           </spacer>
          </item>
+<<<<<<< HEAD
          <item>
           <widget class="QPushButton" name="btSaveResults">
            <property name="enabled">
@@ -426,6 +437,8 @@ background: rgb(255, 255, 255)
            </property>
           </widget>
          </item>
+=======
+>>>>>>> 3aee0baf7fb1c81b3dba9ebaba521735c37be8ae
         </layout>
        </item>
       </layout>

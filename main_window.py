@@ -171,6 +171,7 @@ class Ui_MainWindow(object):
         self.lbAggResults.setEnabled(False)
         self.lbAggResults.setObjectName("lbAggResults")
         self.horizontalLayout_8.addWidget(self.lbAggResults)
+<<<<<<< HEAD
         spacerItem4 = QtWidgets.QSpacerItem(1, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_8.addItem(spacerItem4)
         self.btSaveResults = QtWidgets.QPushButton(self.groupBox_4)
@@ -181,6 +182,13 @@ class Ui_MainWindow(object):
         self.btSaveGraph.setEnabled(False)
         self.btSaveGraph.setObjectName("btSaveGraph")
         self.horizontalLayout_8.addWidget(self.btSaveGraph)
+=======
+        self.lbResults = QtWidgets.QLabel(self.groupBox_4)
+        self.lbResults.setObjectName("lbResults")
+        self.horizontalLayout_8.addWidget(self.lbResults)
+        spacerItem4 = QtWidgets.QSpacerItem(1, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_8.addItem(spacerItem4)
+>>>>>>> 3aee0baf7fb1c81b3dba9ebaba521735c37be8ae
         self.verticalLayout_5.addLayout(self.horizontalLayout_8)
         self.verticalLayout_7.addWidget(self.groupBox_4)
         self.groupBox_5 = QtWidgets.QGroupBox(self.centralwidget)
@@ -226,11 +234,17 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "CAFoG - Correct abundances for glycation"))
         self.groupBox.setTitle(_translate("MainWindow", "Glycoforms"))
+<<<<<<< HEAD
         self.cvGlycoforms.setWhatsThis(_translate("MainWindow", "<html><head/><body><p>Data on glycoforms. Load a dataset from a CSV file by dragging it into the white area or by selecting it after clicking \'Load …\'.</p><p>The CSV file must contain three columns containing glycoform names, abundances, and experimental errors of abundances, respectively. A header is not allowed, but any line starting with \'#\' will be discarded.</p><p>Format for glycoform names: &quot;glycan 1/glycan 2/…/glycan n&quot;.<br/>The monosaccharide composition for glycans whose name follows the Zhang nomenclature will be deduced automatically. The composition for other glycans must be provided in the glycan library.</p><p>Draw a rubberband while pressing the left mouse button to zoom.<br/>Right click to reset zoom.</p></body></html>"))
         self.cbAggGlycoforms.setWhatsThis(_translate("MainWindow", "<html><head/><body><p>Aggregate glycoform abundances if the dataset contains more than the specified number of entries. By default, abundances for the seven most abundant glycoforms will be shown; the abundances of the remaining ones will be summed and shown as \'other\'.</p></body></html>"))
         self.cbAggGlycoforms.setText(_translate("MainWindow", "Only display the"))
         self.lbAggGlycoforms.setText(_translate("MainWindow", "most abundant glycoforms"))
         self.btLoadGlycoforms.setWhatsThis(_translate("MainWindow", "<html><head/><body><p>Load glycoform data.</p></body></html>"))
+=======
+        self.cvGlycoforms.setWhatsThis(_translate("MainWindow", "The whatsthis for the glycoform chart."))
+        self.cbAggGlycoforms.setText(_translate("MainWindow", "Only display the"))
+        self.lbAggGlycoforms.setText(_translate("MainWindow", "most abundant glycoforms"))
+>>>>>>> 3aee0baf7fb1c81b3dba9ebaba521735c37be8ae
         self.btLoadGlycoforms.setText(_translate("MainWindow", "Load …"))
         self.lbGlycoform.setText(_translate("MainWindow", "(glycoform)"))
         self.groupBox_2.setTitle(_translate("MainWindow", "Glycation"))
