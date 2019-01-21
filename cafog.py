@@ -16,7 +16,8 @@ def setup_parser() -> ArgumentParser:
     :rtype: ArgumentParser
     """
     parser = ArgumentParser(
-        description="Correct glycation influence on glycoform abundances.")
+        description="Correct glycation influence on glycoform abundances. "
+                    "Results are written in CSV format to STDOUT.")
 
     parser.add_argument("-f", "--glycoforms",
                         action="store",
@@ -71,11 +72,10 @@ def _main() -> None:
     try:
         G = GlycationGraph(glycan_library, glycoforms, glycation)
         G.correct_abundances()
-        G.to_dataframe().to_csv("{}_corr.csv".format(dataset_name),
-                                index=False)
-        if args.output_format == "dot":
+        G.to_dataframe().to_csv(sys.stdout, index=False)
+        if args.graph_output_format == "dot":
             G.to_dot("{}_corr.gv".format(dataset_name))
-        elif args.output_format == "gexf":
+        elif args.graph_output_format == "gexf":
             G.to_gexf("{}_corr.gexf".format(dataset_name))
     except ValueError as e:
         logging.error(e)
