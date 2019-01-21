@@ -358,13 +358,6 @@ background: rgb(255, 255, 255)
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="lbResults">
-           <property name="text">
-            <string>(results)</string>
-           </property>
-          </widget>
-         </item>
-         <item>
           <spacer name="horizontalSpacer_6">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
