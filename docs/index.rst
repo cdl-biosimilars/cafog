@@ -8,7 +8,8 @@ cafog
    :maxdepth: 2
    :caption: Contents
 
-   workflow
+   workflow_gui
+   workflow_shell
    code
 
 

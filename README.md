@@ -12,6 +12,7 @@ General:
 * PyQtChart
 * Sphinx (for creating the documentation)
 * sphinx_rtd_theme (for creating the documentation)
+* sphinx-argparse
 * uncertainties
 
 
