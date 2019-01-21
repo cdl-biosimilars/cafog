@@ -264,6 +264,5 @@ class Ui_MainWindow(object):
         self.btHelp.setText(_translate("MainWindow", "Help"))
         self.btHelp.setShortcut(_translate("MainWindow", "F1"))
         self.btQuit.setText(_translate("MainWindow", "Quit"))
-        self.btQuit.setShortcut(_translate("MainWindow", "Ctrl+Q"))
 
 from PyQt5.QtChart import QChartView
