@@ -1,11 +1,44 @@
 #!/usr/bin/env python3
 
-import argparse
+from argparse import ArgumentParser
 import logging
 import os
 import sys
 
 from correction import GlycationGraph, read_clean_datasets, read_library
+
+
+def setup_parser() -> ArgumentParser:
+    """
+    Set up options for the argument parser
+
+    :return: a parser for handling command line arguments
+    :rtype: ArgumentParser
+    """
+    parser = ArgumentParser(
+        description="Correct glycation influence on glycoform abundances.")
+
+    parser.add_argument("-f", "--glycoforms",
+                        action="store",
+                        help="CSV file containing glycoform abundances",
+                        required=True)
+    parser.add_argument("-g", "--glycation",
+                        action="store",
+                        help="CSV file containing glycation abundances",
+                        required=True)
+    parser.add_argument("-l", "--glycan-library",
+                        action="store",
+                        help="CSV file containing a glycan library")
+    parser.add_argument("-o", "--graph-output-format",
+                        action="store",
+                        help="graph output format, either 'dot' or 'gexf' ",
+                        metavar="FORMAT",
+                        choices=["dot", "gexf"])
+    parser.add_argument("-v", "--version",
+                        action="version",
+                        help="print the version number",
+                        version="%(prog)s 1.0")
+    return parser
 
 
 def _main() -> None:
@@ -18,31 +51,7 @@ def _main() -> None:
 
     logging.basicConfig(format="%(levelname)s: %(message)s",
                         level=logging.INFO)
-
-    # set up options for the argument parser
-    parser = argparse.ArgumentParser(
-        description="Correct glycation influence on glycoform abundances.")
-    parser.add_argument("-v", "--version",
-                        action="version",
-                        help="print the version number",
-                        version="%(prog)s 1.0")
-    parser.add_argument("-o", "--graph-output-format",
-                        action="store",
-                        help="graph output format, either 'dot' or 'gexf' ",
-                        metavar="FORMAT",
-                        choices=["dot", "gexf"])
-    parser.add_argument("-l", "--glycan-library",
-                        action="store",
-                        help="CSV file containing a glycan library")
-    parser.add_argument("-f", "--glycoforms",
-                        action="store",
-                        help="CSV file containing glycoform abundances",
-                        required=True)
-    parser.add_argument("-g", "--glycation",
-                        action="store",
-                        help="CSV file containing glycation abundances",
-                        required=True)
-    args = parser.parse_args()
+    args = setup_parser().parse_args()
 
     # read input files
     dataset_name = os.path.splitext(args.glycoforms)[0]
