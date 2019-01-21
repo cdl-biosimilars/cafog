@@ -227,7 +227,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "CAFoG - Correct abundances for glycation"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "cafog"))
         self.groupBox.setTitle(_translate("MainWindow", "Glycoforms"))
         self.cvGlycoforms.setWhatsThis(_translate("MainWindow", "<html><head/><body><p>Data on glycoforms. Load a dataset from a CSV file by dragging it into the white area or by selecting it after clicking \'Load …\'.</p><p>The CSV file must contain three columns containing glycoform names, abundances, and experimental errors of abundances, respectively. A header is not allowed, but any line starting with \'#\' will be discarded.</p><p>Format for glycoform names: &quot;glycan 1/glycan 2/…/glycan n&quot;.<br/>The monosaccharide composition for glycans whose name follows the Zhang nomenclature will be deduced automatically. The composition for other glycans must be provided in the glycan library.</p><p>Draw a rubberband while pressing the left mouse button to zoom.<br/>Right click to reset zoom.</p></body></html>"))
         self.cbAggGlycoforms.setWhatsThis(_translate("MainWindow", "<html><head/><body><p>Aggregate glycoform abundances if the dataset contains more than the specified number of entries. By default, abundances for the seven most abundant glycoforms will be shown; the abundances of the remaining ones will be summed and shown as \'other\'.</p></body></html>"))
