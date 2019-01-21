@@ -18,7 +18,8 @@ from PyQt5.QtWidgets import (QApplication, QHeaderView, QMainWindow,
 from correction import GlycationGraph, read_clean_datasets, read_library
 
 from main_window import Ui_MainWindow
-from widgets import FileTypes, SortableTableWidgetItem, get_filename
+from widgets import (FileTypes, SortableTableWidgetItem,
+                     get_filename, open_manual)
 
 
 class TextEditHandler(logging.Handler):
@@ -100,7 +101,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             e, self.cvGlycoforms)
 
         self.btCorrect.clicked.connect(self.correct_abundances)
-        self.btHelp.clicked.connect(lambda: QWhatsThis.enterWhatsThisMode())
+        self.btHelp.clicked.connect(open_manual)
         self.btLoadGlycation.clicked.connect(lambda: self.load_glycation())
         self.btLoadGlycoforms.clicked.connect(lambda: self.load_glycoforms())
         self.btLoadLibrary.clicked.connect(lambda: self.load_library())

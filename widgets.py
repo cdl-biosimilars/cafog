@@ -1,5 +1,7 @@
 import os
 from typing import Dict, List, Optional, Tuple, Union
+from urllib.request import pathname2url
+import webbrowser
 
 from PyQt5.QtWidgets import QFileDialog, QTableWidgetItem, QWidget
 
@@ -180,3 +182,16 @@ def get_filename(parent: QWidget,
     if not filename.endswith(ext):
         filename += "." + ext
     return filename, new_path
+
+
+def open_manual() -> None:
+    """
+    Open the manual in a browser.
+
+    :return: nothing
+    :rtype: None
+    """
+
+    path = os.path.abspath(
+        os.path.join("docs", "_build", "html", "index.html"))
+    webbrowser.open("file:{}".format(pathname2url(path)))
