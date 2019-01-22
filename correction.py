@@ -5,10 +5,13 @@ from typing import Optional
 from multiset import FrozenMultiset
 import networkx as nx
 import pandas as pd
+from PyQt5 import QtCore
 from uncertainties import ufloat
 
 from glycan import PTMComposition
 from glycoprotein import Glycoprotein
+
+translate = QtCore.QCoreApplication.translate
 
 
 class GlycationGraph(nx.DiGraph):
@@ -60,8 +63,9 @@ class GlycationGraph(nx.DiGraph):
 
         if glycan_library is None:
             # fill the glycan library from glycans in glycoforms
-            logging.info("No glycan library specified. "
-                         "Extracting glycans from glycoforms …")
+            logging.info(translate("correction",
+                                   "No glycan library specified. "
+                                   "Extracting glycans from glycoforms ..."))
             for g in glycoform_glycans:
                 try:
                     gp.add_glycan(g)
@@ -76,16 +80,21 @@ class GlycationGraph(nx.DiGraph):
             glycans_only_in_library = library_glycans - glycoform_glycans
             if glycans_only_in_library:
                 logging.warning(
-                    "The following glycans only appear in the glycan library, "
-                    "but not in the list of glycoforms: {}."
+                    translate(
+                        "correction",
+                        "The following glycans only appear "
+                        "in the glycan library, "
+                        "but not in the list of glycoforms: {}.")
                     .format(", ".join(glycans_only_in_library)))
 
             glycans_only_in_glycoforms = glycoform_glycans - library_glycans
             if glycans_only_in_glycoforms:
                 logging.warning(
-                    "The following glycans only appear in the list of "
-                    "glycoforms, but not in the glycan library: {}. "
-                    "They will be added to the library."
+                    translate(
+                        "correction",
+                        "The following glycans only appear in the list of "
+                        "glycoforms, but not in the glycan library: {}. "
+                        "They will be added to the library.")
                     .format(", ".join(glycans_only_in_glycoforms)))
                 for g in glycans_only_in_glycoforms:
                     try:
@@ -239,15 +248,21 @@ def read_clean_datasets(filename: str) -> pd.Series:
     col_count = df.shape[1]
 
     if col_count == 0:  # too few columns
-        raise ValueError("{} contains too few columns.".format(filename))
+        raise ValueError(
+            translate("correction",
+                      "{} contains too few columns.").format(filename))
     elif col_count == 1:  # add error column
         logging.warning(
-            "{} lacks a column containing errors. Assuming errors of zero."
+            translate("correction",
+                      "{} lacks a column containing errors. "
+                      "Assuming errors of zero.")
             .format(filename))
         df["auto_error_column"] = 0
     elif col_count > 2:  # remove surplus columns
         logging.warning(
-            "{} contains {} additional columns, which will be ignored."
+            translate("correction",
+                      "{} contains {} additional columns, "
+                      "which will be ignored.")
             .format(filename, col_count-2))
         df = df.iloc[:, :3]
     df.index.name = "index_col"
@@ -270,10 +285,14 @@ def read_library(filename: str=None) -> pd.DataFrame:
     col_count = df.shape[1]
 
     if col_count < 2:  # too few columns
-        raise ValueError("{} contains too few columns.".format(filename))
+        raise ValueError(
+            translate("correction",
+                      "{} contains too few columns.").format(filename))
     elif col_count > 2:  # remove surplus columns
         logging.warning(
-            "{} contains {} additional columns, which will be ignored."
+            translate("correction",
+                      "{} contains {} additional columns, "
+                      "which will be ignored.")
             .format(filename, col_count-2))
         df = df.iloc[:, :3]
     return df

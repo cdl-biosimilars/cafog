@@ -88,7 +88,7 @@
            <item>
             <widget class="QPushButton" name="btLoadGlycoforms">
              <property name="text">
-              <string>Load …</string>
+              <string>Load ...</string>
              </property>
             </widget>
            </item>
@@ -147,7 +147,7 @@
            <item>
             <widget class="QPushButton" name="btLoadGlycation">
              <property name="text">
-              <string>Load …</string>
+              <string>Load ...</string>
              </property>
             </widget>
            </item>
@@ -207,7 +207,7 @@
            <item>
             <widget class="QPushButton" name="btLoadLibrary">
              <property name="text">
-              <string>Load …</string>
+              <string>Load ...</string>
              </property>
             </widget>
            </item>
@@ -376,7 +376,7 @@ background: rgb(255, 255, 255)
             <bool>false</bool>
            </property>
            <property name="text">
-            <string>Save results …</string>
+            <string>Save results ...</string>
            </property>
           </widget>
          </item>
@@ -386,7 +386,7 @@ background: rgb(255, 255, 255)
             <bool>false</bool>
            </property>
            <property name="text">
-            <string>Save glycation graph …</string>
+            <string>Save glycation graph ...</string>
            </property>
           </widget>
          </item>

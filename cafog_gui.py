@@ -7,13 +7,12 @@ import pandas as pd
 
 from PyQt5.QtChart import (QBarCategoryAxis, QBarSeries, QBarSet,
                            QChart, QChartView, QValueAxis)
-from PyQt5.QtCore import (Qt, QLibraryInfo, QLocale, QMargins,
-                          QRectF, QSize, QTranslator)
+from PyQt5.QtCore import (Qt, QLibraryInfo, QLocale,
+                          QMargins, QRectF, QSize, QTranslator)
 from PyQt5.QtGui import QBrush, QColor, QDropEvent, QMouseEvent, QPainter
 from PyQt5.QtSvg import QSvgGenerator
 from PyQt5.QtWidgets import (QApplication, QHeaderView, QMainWindow,
-                             QMessageBox, QTableWidgetItem, QTextEdit,
-                             QWhatsThis, QWidget)
+                             QMessageBox, QTableWidgetItem, QTextEdit, QWidget)
 
 from correction import GlycationGraph, read_clean_datasets, read_library
 
@@ -122,7 +121,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.cvGlycation.chart().setBackgroundRoundness(0)
         self.cvGlycation.chart().layout().setContentsMargins(0, 0, 0, 0)
         drop_hint = self.cvGlycation.scene().addText(
-            self.tr("Drag and drop glycation data\nor click 'Load …'"))
+            self.tr("Drag and drop glycation data\nor click 'Load ...'"))
         drop_hint.setDefaultTextColor(QColor("#888888"))
 
         self.cvGlycoforms.chart().setBackgroundRoundness(0)
@@ -131,7 +130,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.old_gf_mouse_release_event = self.cvGlycoforms.mouseReleaseEvent
         self.cvGlycoforms.mouseReleaseEvent = self.zoom_glycoform_graph
         drop_hint = self.cvGlycoforms.scene().addText(
-            self.tr("Drag and drop glycoform data\nor click 'Load …'"))
+            self.tr("Drag and drop glycoform data\nor click 'Load ...'"))
         drop_hint.setDefaultTextColor(QColor("#888888"))
 
         self.cvResults.chart().setBackgroundRoundness(0)
@@ -154,8 +153,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.twLibrary.setRowCount(2)
         self.twLibrary.setSpan(0, 0, 2, 2)
         item = QTableWidgetItem(
-            self.tr("Drag and drop glycan library data\n"
-                    "or click 'Load …' (optional)"))
+            self.tr("""Drag and drop glycan library data\n
+or click 'Load ...' (optional)"""))
         item.setFlags(Qt.ItemIsEnabled)
         item.setForeground(QBrush(QColor("#888888")))
         self.twLibrary.setItem(0, 0, item)
@@ -196,17 +195,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # load and clean glycation data
         if filename is None:
             filename, self.last_path = get_filename(
-                self, "open", "Load glycation data …",
+                self, "open", self.tr("Load glycation data ..."),
                 self.last_path, FileTypes(["csv"]))
             if filename is None:
                 return
 
-        logging.info("Loading glycation data in '{}'".format(filename))
+        logging.info(self.tr("Loading glycation data in '{}'")
+                     .format(filename))
         try:
             self.glycation = read_clean_datasets(filename)
         except (OSError, ValueError) as e:
             logging.error(str(e))
-            QMessageBox.critical(self, "Error", str(e))
+            QMessageBox.critical(self, self.tr("Error"), str(e))
             return
 
         # extract x- and y-values from series
@@ -223,11 +223,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         x_axis = QBarCategoryAxis()
         x_axis.append(x_values)
-        x_axis.setTitleText("count")
+        x_axis.setTitleText(self.tr("count"))
 
         y_axis = QValueAxis()
         y_axis.setRange(0, 100)
-        y_axis.setTitleText("abundance")
+        y_axis.setTitleText(self.tr("abundance"))
         y_axis.setLabelFormat("%d")
 
         chart = QChart()
@@ -275,10 +275,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
 
         if hover:
+            if bar_index == 0:
+                label = self.tr("no glycation")
+            elif bar_index == 1:
+                label = self.tr("1 glycation")
+            else:
+                label = self.tr("{} glycations").format(bar_index)
             self.lbGlycation.setText(
-                "{} glycation{}: <b>{:.2f}</b> ± {:.2f} %".format(
-                    "no" if bar_index == 0 else bar_index,
-                    "" if bar_index < 2 else "s",
+                "{}: <b>{:.2f}</b> ± {:.2f} %".format(
+                    label,
                     self.glycation[bar_index].nominal_value,
                     self.glycation[bar_index].std_dev))
         else:
@@ -297,18 +302,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # load and clean glycoform data
         if filename is None:
             filename, self.last_path = get_filename(
-                self, "open", "Load glycoform data …",
+                self, "open", self.tr("Load glycoform data ..."),
                 self.last_path, FileTypes(["csv"]))
             if filename is None:
                 return
 
-        logging.info("Loading glycoform data in '{}'".format(filename))
+        logging.info(self.tr("Loading glycoform data in '{}'")
+                     .format(filename))
         try:
             self.glycoforms = (read_clean_datasets(filename)
                                .sort_values(ascending=False))
         except (OSError, ValueError) as e:
             logging.error(str(e))
-            QMessageBox.critical(self, "Error", str(e))
+            QMessageBox.critical(self, self.tr("Error"), str(e))
             return
 
         for widget in (self.cbAggGlycoforms,
@@ -374,7 +380,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.glycoforms_agg = (
                 self.glycoforms
                     .iloc[:self.sbAggGlycoforms.value()]
-                    .append(pd.Series(agg_abundance, index=["other"])))
+                    .append(
+                        pd.Series(agg_abundance, index=[self.tr("other")])))
         else:
             self.glycoforms_agg = self.glycoforms
 
@@ -401,7 +408,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         y_axis = QValueAxis()
         y_axis.setRange(0, range_max)
         y_axis.setTickCount(tick_count)
-        y_axis.setTitleText("abundance")
+        y_axis.setTitleText(self.tr("abundance"))
         y_axis.setLabelFormat("%d")
 
         chart = QChart()
@@ -440,17 +447,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         if filename is None:
             filename, self.last_path = get_filename(
-                self, "open", "Load glycan library …",
+                self, "open", self.tr("Load glycan library ..."),
                 self.last_path, FileTypes(["csv"]))
             if filename is None:
                 return
 
-        logging.info("Loading glycan library in '{}'".format(filename))
+        logging.info(self.tr("Loading glycan library in '{}'")
+                     .format(filename))
         try:
             self.library = read_library(filename)
         except (OSError, ValueError) as e:
             logging.error(str(e))
-            QMessageBox.critical(self, "Error", str(e))
+            QMessageBox.critical(self, self.tr("Error"), str(e))
             return
 
         # fill the table
@@ -473,18 +481,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         :rtype: None
         """
 
-        missing_input = ["Please provide the following input data:"]
+        missing_input = [self.tr("Please provide the following input data:")]
         if self.glycoforms is None:
-            missing_input.append("glycoforms")
+            missing_input.append(self.tr("glycoforms"))
         if self.glycation is None:
-            missing_input.append("glycation")
+            missing_input.append(self.tr("glycation"))
         if len(missing_input) > 1:
             logging.error(" ".join(missing_input))
             QMessageBox.critical(
-                self, "Error", "\n- ".join(missing_input))
+                self, self.tr("Error"), "\n- ".join(missing_input))
             return
 
-        logging.info("Correcting dataset  …")
+        logging.info(self.tr("Correcting dataset  ..."))
         QApplication.setOverrideCursor(Qt.WaitCursor)
         QApplication.processEvents()
         try:
@@ -496,10 +504,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         except ValueError as e:
             QApplication.restoreOverrideCursor()
             logging.error(str(e))
-            QMessageBox.critical(self, "Error", str(e))
+            QMessageBox.critical(self, self.tr("Error"), str(e))
             return
 
-        logging.info("… done!")
+        logging.info(self.tr("... done!"))
         self.show_results()
         QApplication.restoreOverrideCursor()
 
@@ -561,21 +569,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if hover:
             self.lbResults.setText(
                 "{}: "
-                "observed <b><font color='#225ea8'>{:.2f}</font></b> "
+                "{} <b><font color='#225ea8'>{:.2f}</font></b> "
                 "± {:.2f} %, "
-                "corrected <b><font color='#41b6c4'>{:.2f}</font></b> "
+                "{} <b><font color='#41b6c4'>{:.2f}</font></b> "
                 "± {:.2f} %".format(
                     self.results_agg.iloc[bar_index, 0]
                         .split(" or ", 1)[0],
+                    self.tr("observed"),
                     self.results_agg.iloc[bar_index, 1],
                     self.results_agg.iloc[bar_index, 2],
+                    self.tr("corrected"),
                     self.results_agg.iloc[bar_index, 3],
                     self.results_agg.iloc[bar_index, 4]))
         else:
             self.lbResults.setText(
-                "<font color='#225ea8'>&#x25A0;</font> observed"
+                "<font color='#225ea8'>&#x25A0;</font> {}"
                 "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-                "<font color='#41b6c4'>&#x25A0;</font> corrected")
+                "<font color='#41b6c4'>&#x25A0;</font> {}"
+                .format(self.tr("observed"), self.tr("corrected")))
 
     def zoom_results_graph(self,
                            e: QMouseEvent) -> None:
@@ -608,7 +619,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             agg_abundance = (self.results
                              .iloc[self.sbAggResults.value():]
                              .sum())
-            agg_abundance["glycoform"] = "other"
+            agg_abundance["glycoform"] = self.tr("other")
             self.results_agg = (
                 self.results
                     .iloc[:self.sbAggResults.value()]
@@ -622,11 +633,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         y_values_cor = list(self.results_agg["corr_abundance"])
 
         # assemble the chart
-        bar_set_obs = QBarSet("observed")
+        bar_set_obs = QBarSet(self.tr("observed"))
         bar_set_obs.append(y_values_obs)
         bar_set_obs.setColor(QColor("#225ea8"))
         bar_set_obs.hovered.connect(self.update_results_label)
-        bar_set_cor = QBarSet("corrected")
+        bar_set_cor = QBarSet(self.tr("corrected"))
         bar_set_cor.append(y_values_cor)
         bar_set_cor.setColor(QColor("#41b6c4"))
         bar_set_cor.hovered.connect(self.update_results_label)
@@ -649,7 +660,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         y_axis = QValueAxis()
         y_axis.setRange(range_min, range_max)
         y_axis.setTickCount(tick_count)
-        y_axis.setTitleText("abundance")
+        y_axis.setTitleText(self.tr("abundance"))
         y_axis.setLabelFormat("%d")
 
         chart = QChart()
@@ -685,12 +696,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
 
         filename, self.last_path = get_filename(
-            self, "save", "Save results …",
+            self, "save", self.tr("Save results ..."),
             self.last_path, FileTypes(["csv", "png", "svg"]))
         if filename is None:
             return
 
-        logging.info("Saving results to '{}'".format(filename))
+        logging.info(self.tr("Saving results to '{}'").format(filename))
         try:
             if filename.endswith("csv"):
                 self.results.to_csv(filename, index=False)
@@ -714,7 +725,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 painter.end()
         except (OSError, ValueError) as e:
             logging.error(str(e))
-            QMessageBox.critical(self, "Error", str(e))
+            QMessageBox.critical(self, self.tr("Error"), str(e))
             return
 
     def save_graph(self) -> None:
@@ -726,12 +737,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
 
         filename, self.last_path = get_filename(
-            self, "save", "Save glycation graph …",
+            self, "save", self.tr("Save glycation graph ..."),
             self.last_path, FileTypes(["gv", "gexf"]))
         if filename is None:
             return
 
-        logging.info("Saving glycationg graph to '{}'".format(filename))
+        logging.info(self.tr("Saving glycation graph to '{}'")
+                     .format(filename))
         try:
             if filename.endswith("gv"):
                 self.glycation_graph.to_dot(filename)
@@ -739,7 +751,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.glycation_graph.to_gexf(filename)
         except (OSError, ValueError) as e:
             logging.error(str(e))
-            QMessageBox.critical(self, "Error", str(e))
+            QMessageBox.critical(self, self.tr("Error"), str(e))
             return
 
 
