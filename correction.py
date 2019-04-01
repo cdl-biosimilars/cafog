@@ -49,6 +49,17 @@ class GlycationGraph(nx.DiGraph):
         exp_abundances = glycoforms.reset_index()
         exp_abundances["sugar_set"] = exp_abundances["index_col"].apply(
             lambda v: FrozenMultiset(v.split("/")))
+        site_count = exp_abundances["sugar_set"].apply(len).unique()
+        if site_count.size != 1:
+            raise ValueError(
+                translate(
+                    "correction",
+                    "Glycoforms have unequal number of glycosylation sites."))
+        else:
+            site_count = int(site_count[0])
+            logging.info(translate("correction",
+                                   "Glycoprotein has {} sites."
+                                   .format(site_count)))
         exp_abundances = exp_abundances.set_index("sugar_set")["abundance"]
 
         # dict mapping hexose differences to abundances
@@ -56,7 +67,7 @@ class GlycationGraph(nx.DiGraph):
                      for count, abundance in glycation.iteritems()
                      if count > 0}
 
-        gp = Glycoprotein(sites=2, library=glycan_library)
+        gp = Glycoprotein(sites=site_count, library=glycan_library)
         glycoform_glycans = set()
         for v in exp_abundances.index.values:
             glycoform_glycans |= set(v)
