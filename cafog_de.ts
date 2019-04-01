@@ -26,132 +26,132 @@ or click &apos;Load ...&apos; (optional)</source>
 oder auf &apos;Öffnen …&apos; klicken</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="14"/>
+        <location filename="main_window.py" line="227"/>
         <source>cafog</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="23"/>
+        <location filename="main_window.py" line="228"/>
         <source>Glycoforms</source>
         <translation>Glykoformen</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="333"/>
+        <location filename="main_window.py" line="257"/>
         <source>Only display the</source>
         <translation>Nur die</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="356"/>
+        <location filename="main_window.py" line="258"/>
         <source>most abundant glycoforms</source>
         <translation>häufigsten Glykoformen zeigen</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="210"/>
+        <location filename="main_window.py" line="241"/>
         <source>Load ...</source>
         <translation>Öffnen ...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="120"/>
+        <location filename="main_window.py" line="232"/>
         <source>(glycoform)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="132"/>
+        <location filename="main_window.py" line="233"/>
         <source>Glycation</source>
         <translation>Glykierung</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="170"/>
+        <location filename="main_window.py" line="235"/>
         <source>(glycation)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="182"/>
+        <location filename="main_window.py" line="236"/>
         <source>Glycan library</source>
         <translation>Glykanbibliothek</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="195"/>
+        <location filename="main_window.py" line="238"/>
         <source>Glycan</source>
         <translation>Glykan</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="200"/>
+        <location filename="main_window.py" line="240"/>
         <source>Composition</source>
         <translation>Zusammensetzung</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="237"/>
+        <location filename="main_window.py" line="242"/>
         <source>Results</source>
         <translation>Ergebnisse</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="277"/>
+        <location filename="main_window.py" line="243"/>
         <source>(results)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="293"/>
+        <location filename="main_window.py" line="246"/>
         <source>Glycoform</source>
         <translation>Glykoform</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="298"/>
+        <location filename="main_window.py" line="248"/>
         <source>Observed</source>
         <translation>Beobachtet</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="313"/>
+        <location filename="main_window.py" line="254"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="308"/>
+        <location filename="main_window.py" line="252"/>
         <source>Actual</source>
         <translation>Tatsächlich</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="318"/>
+        <location filename="main_window.py" line="256"/>
         <source>Change</source>
         <translation>Veränderung</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="379"/>
+        <location filename="main_window.py" line="259"/>
         <source>Save results ...</source>
         <translation>Ergebnisse speichern ...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="389"/>
+        <location filename="main_window.py" line="260"/>
         <source>Save glycation graph ...</source>
         <translation>Glykierungsgraph speichern ...</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="401"/>
+        <location filename="main_window.py" line="261"/>
         <source>Log</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="431"/>
+        <location filename="main_window.py" line="262"/>
         <source>Correct abundances</source>
         <translation>Häufigkeiten korrigieren</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="451"/>
+        <location filename="main_window.py" line="263"/>
         <source>Load sample data</source>
         <translation>Beispieldaten öffnen</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="458"/>
+        <location filename="main_window.py" line="264"/>
         <source>Help</source>
         <translation>Hilfe</translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="461"/>
+        <location filename="main_window.py" line="265"/>
         <source>F1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="main_window.ui" line="468"/>
+        <location filename="main_window.py" line="266"/>
         <source>Quit</source>
         <translation>Ende</translation>
     </message>
@@ -264,34 +264,44 @@ oder auf &apos;Öffnen …&apos; klicken</translation>
 <context>
     <name>correction</name>
     <message>
-        <location filename="correction.py" line="66"/>
+        <location filename="correction.py" line="76"/>
         <source>No glycan library specified. Extracting glycans from glycoforms ...</source>
         <translation>Keine Glykanbibliothek angegeben. Glykane werden aus Glykoformen berechnet ...</translation>
     </message>
     <message>
-        <location filename="correction.py" line="82"/>
+        <location filename="correction.py" line="92"/>
         <source>The following glycans only appear in the glycan library, but not in the list of glycoforms: {}.</source>
         <translation>Die folgenden Glykane erscheinen nur in der Glykanbibliothek, nicht aber in der Liste der Glykoformen: {}.</translation>
     </message>
     <message>
-        <location filename="correction.py" line="92"/>
+        <location filename="correction.py" line="102"/>
         <source>The following glycans only appear in the list of glycoforms, but not in the glycan library: {}. They will be added to the library.</source>
         <translation>Die folgenden Glykane erscheinen nur in der Liste der Glykoformen, nicht aber in der Glykanbibliothek: {}. Sie werden zur Bibliothek hinzugefügt.</translation>
     </message>
     <message>
-        <location filename="correction.py" line="289"/>
+        <location filename="correction.py" line="299"/>
         <source>{} contains too few columns.</source>
         <translation>{} enthält zu wenig Spalten.</translation>
     </message>
     <message>
-        <location filename="correction.py" line="256"/>
+        <location filename="correction.py" line="266"/>
         <source>{} lacks a column containing errors. Assuming errors of zero.</source>
         <translation>{} enthält keine Spalte mit Messfehlern. Verwende Messfehler von null.</translation>
     </message>
     <message>
-        <location filename="correction.py" line="293"/>
+        <location filename="correction.py" line="303"/>
         <source>{} contains {} additional columns, which will be ignored.</source>
         <translation>{} enthält {} zusätzliche Spalten, die ignoriert werden.</translation>
+    </message>
+    <message>
+        <location filename="correction.py" line="54"/>
+        <source>Glycoforms have unequal number of glycosylation sites.</source>
+        <translation>Glykoformen unterscheiden sich in der Anzahl der Glykierungsstellen.</translation>
+    </message>
+    <message>
+        <location filename="correction.py" line="60"/>
+        <source>Glycoprotein has {} sites.</source>
+        <translation>Glykoprotein enthält {} Glykierungsstellen.</translation>
     </message>
 </context>
 </TS>

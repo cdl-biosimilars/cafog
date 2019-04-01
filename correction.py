@@ -57,9 +57,8 @@ class GlycationGraph(nx.DiGraph):
                     "Glycoforms have unequal number of glycosylation sites."))
         else:
             site_count = int(site_count[0])
-            logging.info(translate("correction",
-                                   "Glycoprotein has {} sites."
-                                   .format(site_count)))
+            logging.info(translate("correction", "Glycoprotein has {} sites.")
+                         .format(site_count))
         exp_abundances = exp_abundances.set_index("sugar_set")["abundance"]
 
         # dict mapping hexose differences to abundances
